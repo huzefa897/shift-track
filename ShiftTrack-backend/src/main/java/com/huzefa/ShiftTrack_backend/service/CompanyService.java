@@ -3,6 +3,7 @@ package com.huzefa.ShiftTrack_backend.service;
 import com.huzefa.ShiftTrack_backend.dto.CompanyRequest;
 import com.huzefa.ShiftTrack_backend.dto.CompanyResponse;
 import com.huzefa.ShiftTrack_backend.entity.Company;
+import com.huzefa.ShiftTrack_backend.exception.ResourceNotFoundException;
 import com.huzefa.ShiftTrack_backend.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class CompanyService {
 
     public CompanyResponse getCompanybyId(Long id){
         Company company = companyRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("Company not Found with this Id" + id));
+                .orElseThrow(()->new ResourceNotFoundException("Company not Found with this Id " + id));
         return mapToResponse(company);
     }
 

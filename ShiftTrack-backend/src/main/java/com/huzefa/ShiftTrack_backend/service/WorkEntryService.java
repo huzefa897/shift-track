@@ -5,6 +5,7 @@ import com.huzefa.ShiftTrack_backend.dto.WorkEntryRequest;
 import com.huzefa.ShiftTrack_backend.dto.WorkEntryResponse;
 import com.huzefa.ShiftTrack_backend.entity.Company;
 import com.huzefa.ShiftTrack_backend.entity.WorkEntry;
+import com.huzefa.ShiftTrack_backend.exception.ResourceNotFoundException;
 import com.huzefa.ShiftTrack_backend.repository.CompanyRepository;
 import com.huzefa.ShiftTrack_backend.repository.WorkEntryRepository;
 import jakarta.validation.constraints.DecimalMin;
@@ -41,7 +42,7 @@ public class WorkEntryService {
     }
     public WorkEntryResponse getWorkEntryById(Long id) {
         WorkEntry workEntry = workEntryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Work entry not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Work entry not found with id: " + id));
 
         return mapToResponse(workEntry);
     }
@@ -49,7 +50,7 @@ public class WorkEntryService {
 
     public WorkEntryResponse createWorkEntryRequest(WorkEntryRequest request) {
         Company company = companyRepository.findById(request.getCompanyId())
-                .orElseThrow(() -> new RuntimeException("Company not found with id: " + request.getCompanyId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + request.getCompanyId()));
 
         BigDecimal totalHours = calculateTotalHours(
                 request.getStartTime(),
