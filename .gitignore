@@ -1,0 +1,12 @@
+# backend
+ShiftTrack-backend/target/
+ShiftTrack-backend/.idea/
+ShiftTrack-backend/*.log
+
+# frontend
+ShiftTrack-frontend/node_modules/
+ShiftTrack-frontend/dist/
+
+# system
+.DS_Store
+.env

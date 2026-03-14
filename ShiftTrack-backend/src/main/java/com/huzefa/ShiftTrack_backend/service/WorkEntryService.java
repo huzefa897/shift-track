@@ -9,6 +9,7 @@ import com.huzefa.ShiftTrack_backend.repository.CompanyRepository;
 import com.huzefa.ShiftTrack_backend.repository.WorkEntryRepository;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -105,8 +106,25 @@ public class WorkEntryService {
                 .map(this::mapToResponse)
                 .toList();
     }
-    public SummaryResponse getSummaryResponse(LocalDate from, LocalDate to){
+    public SummaryResponse getSummaryBetweenDates(LocalDate from, LocalDate to){
             List<WorkEntry> entries = workEntryRepository.findByWorkDateBetween(from, to);
-            BigDecimal totalHours = 
+            BigDecimal totalHours = entries.stream()
+                    .map(WorkEntry::getTotalHours)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .setScale(2,RoundingMode.HALF_UP);
+
+            BigDecimal totalPay = entries.stream()
+                    .map(WorkEntry::getCalculatedPay)
+                    .reduce(BigDecimal.ZERO,BigDecimal::add)
+                    .setScale(2,RoundingMode.HALF_UP);
+
+            long totalEntries = entries.size();
+            return SummaryResponse.builder()
+                    .totalHours(totalHours)
+                    .totalPay(totalPay)
+                    .totalEntries(totalEntries)
+                    .build();
+
+
     }
 }

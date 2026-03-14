@@ -12,13 +12,6 @@ import java.time.LocalDate;
 
 @Service
 public class PayCalculationService {
-    private final WorkEntryRepository workEntryRepository;
-    private final CompanyRepository companyRepository;
-    public PayCalculationService(WorkEntryRepository workEntryRepository, CompanyRepository companyRepository){
-        this.companyRepository = companyRepository;
-        this.workEntryRepository = workEntryRepository;
-
-    }
     public BigDecimal calculatedPay(LocalDate workDate,
                                     BigDecimal totalHours,
                                     Company company){
