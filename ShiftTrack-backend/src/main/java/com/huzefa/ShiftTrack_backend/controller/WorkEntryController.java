@@ -5,6 +5,7 @@ import com.huzefa.ShiftTrack_backend.dto.WorkEntryResponse;
 import com.huzefa.ShiftTrack_backend.service.WorkEntryService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.security.Provider;
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ public class WorkEntryController {
 
     @PostMapping
     public WorkEntryResponse createWorkEntry(@Valid @RequestBody WorkEntryRequest workEntryRequest){
-        return workEntryService.createWorkEntryRequest(workEntryRequest);
+        return workEntryService.createWorkEntry(workEntryRequest);
     }
 
     @GetMapping
@@ -36,5 +37,15 @@ public class WorkEntryController {
                                                               @RequestParam LocalDate to){
 
     return workEntryService.getWorkEntriesBetweenDates(from,to);
+    }
+    @PutMapping("/{id}")
+    public WorkEntryResponse updateWorkEntry(@PathVariable Long id,
+                                             @Valid @RequestBody WorkEntryRequest request) {
+        return workEntryService.updateWorkEntry(id, request);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteWorkEntry(@PathVariable Long id) {
+        workEntryService.deleteWorkEntry(id);
+        return ResponseEntity.noContent().build();
     }
 }

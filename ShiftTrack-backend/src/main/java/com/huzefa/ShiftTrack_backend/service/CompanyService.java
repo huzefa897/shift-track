@@ -57,5 +57,21 @@ public class CompanyService {
                 .sundayRate(company.getSundayRate())
                 .build();
     }
+    public void deleteCompany(Long id){
+        Company company = companyRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException(("Company not Found with the id " + id)));
+        companyRepository.delete(company);
+
+    }
+    public CompanyResponse updateCompany(Long id, CompanyRequest companyRequest){
+        Company company = companyRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Company not found with id " + id));
+            company.setName(companyRequest.getName());
+            company.setSundayRate(companyRequest.getSundayRate());
+            company.setWeekdayRate(companyRequest.getWeekdayRate());
+            company.setSaturdayRate(companyRequest.getWeekdayRate());
+            Company updatedCompany = companyRepository.save(company);
+            return mapToResponse(updatedCompany);
+    }
 
 }
