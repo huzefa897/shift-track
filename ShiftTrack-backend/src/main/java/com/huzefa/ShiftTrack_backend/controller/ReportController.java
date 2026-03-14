@@ -7,11 +7,13 @@ import com.huzefa.ShiftTrack_backend.service.WorkEntryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
-@Controller
-@RequestMapping("/api/reports")
+@RestController
+@RequestMapping("api/reports")
 public class ReportController {
 
     private final WorkEntryService workEntryService;
@@ -21,7 +23,7 @@ public class ReportController {
     }
 
     @GetMapping("/summary")
-    public SummaryResponse getSummaryBetweenDates(LocalDate from, LocalDate to){
+    public SummaryResponse getSummaryBetweenDates(@RequestParam LocalDate from,@RequestParam LocalDate to){
         return workEntryService.getSummaryBetweenDates(from,to);
     }
 }
