@@ -1,139 +1,77 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import api from "@/api/axios";
+import CompanyForm from "@/components/CompanyForm";
+import CompanyList from "@/components/CompanyList";
 
-export default function CompanyForm({ onCompanyCreated }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    weekdayRate: "",
-    saturdayRate: "",
-    sundayRate: "",
-  });
+function CompaniesPage() {
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] = useState(false);
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  async function fetchCompanies() {
+    try {
+      setLoading(true);
+      const response = await api.get("/companies");
+      setCompanies(response.data);
+      setError("");
+    } catch (err) {
+      console.error("Failed to fetch companies:", err);
+      setError("Failed to load companies. Make sure backend is running.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
-
-    await onCompanyCreated({
-      name: formData.name,
-      weekdayRate: Number(formData.weekdayRate),
-      saturdayRate: Number(formData.saturdayRate),
-      sundayRate: Number(formData.sundayRate),
-    });
-
-    setFormData({
-      name: "",
-      weekdayRate: "",
-      saturdayRate: "",
-      sundayRate: "",
-    });
-
-    setLoading(false);
+  async function handleAddCompany(newCompany) {
+    try {
+      const response = await api.post("/companies", newCompany);
+      setCompanies((prev) => [...prev, response.data]);
+      setError("");
+    } catch (err) {
+      console.error("Failed to add company:", err);
+      setError("Failed to add company.");
+      throw err;
+    }
   }
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
 
   return (
-    <div className="max-w-md mx-auto bg-[#0f0f0f] border border-[#222] rounded-3xl p-10 shadow-lg">
-
-      <h2 className="text-2xl font-semibold text-white text-center mb-2">
-        Add Company
-      </h2>
-
-      <p className="text-center text-gray-400 text-sm mb-8">
-        Define the hourly rates for this company
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-
-        {/* Company Name */}
-        <div>
-          <label className="block text-sm text-gray-400 mb-2">
-            Company Name
-          </label>
-
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white outline-none focus:border-gray-500 transition"
-            placeholder="e.g. RDC"
-            required
-          />
+    <div className="min-h-screen bg-black text-zinc-100">
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <div className="mb-8">
+          <p className="mb-2 text-sm uppercase tracking-[0.2em] text-zinc-500">
+            ShiftTrack
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight">Companies</h1>
+          <p className="mt-2 max-w-2xl text-sm text-zinc-400">
+            Manage companies and store the pay rates that will be used later for
+            work entry calculations.
+          </p>
         </div>
 
-        {/* Weekday */}
-        <div>
-          <label className="block text-sm text-gray-400 mb-2">
-            Weekday Rate
-          </label>
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
 
-          <input
-            type="number"
-            step="0.01"
-            name="weekdayRate"
-            value={formData.weekdayRate}
-            onChange={handleChange}
-            className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white outline-none focus:border-gray-500 transition"
-            placeholder="30.00"
-            required
-          />
+        <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
+          <CompanyForm onAddCompany={handleAddCompany} />
+
+          {loading ? (
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-400">
+              Loading companies...
+            </div>
+          ) : (
+            <CompanyList companies={companies} />
+          )}
         </div>
-
-        {/* Saturday */}
-        <div>
-          <label className="block text-sm text-gray-400 mb-2">
-            Saturday Rate
-          </label>
-
-          <input
-            type="number"
-            step="0.01"
-            name="saturdayRate"
-            value={formData.saturdayRate}
-            onChange={handleChange}
-            className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white outline-none focus:border-gray-500 transition"
-            placeholder="36.00"
-            required
-          />
-        </div>
-
-        {/* Sunday */}
-        <div>
-          <label className="block text-sm text-gray-400 mb-2">
-            Sunday Rate
-          </label>
-
-          <input
-            type="number"
-            step="0.01"
-            name="sundayRate"
-            value={formData.sundayRate}
-            onChange={handleChange}
-            className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white outline-none focus:border-gray-500 transition"
-            placeholder="42.00"
-            required
-          />
-        </div>
-
-        {/* Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full mt-4 bg-white text-black rounded-xl py-3 font-medium hover:opacity-90 transition"
-        >
-          {loading ? "Saving..." : "Add Company"}
-        </button>
-
-      </form>
+      </div>
     </div>
   );
 }
+
+export default CompaniesPage;

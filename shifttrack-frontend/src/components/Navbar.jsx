@@ -1,45 +1,45 @@
-import { NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-export default function Navbar() {
-  const baseClasses =
-    "px-4 py-2 rounded-lg text-sm font-medium transition-colors";
-  const activeClasses = "bg-slate-700 text-white";
-  const inactiveClasses = "text-slate-300 hover:bg-slate-800 hover:text-white";
+function Navbar() {
+  const location = useLocation();
+
+  const links = [
+    { to: "/", label: "Dashboard" },
+    { to: "/companies", label: "Companies" },
+    { to: "/entries", label: "Work Entries" },
+  ];
 
   return (
-    <nav className="bg-slate-900 border-b border-slate-800 px-6 py-4">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">ShiftTrack</h1>
-
-        <div className="flex gap-3">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`
-            }
-          >
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/companies"
-            className={({ isActive }) =>
-              `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`
-            }
-          >
-            Companies
-          </NavLink>
-
-          <NavLink
-            to="/work-entries"
-            className={({ isActive }) =>
-              `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`
-            }
-          >
-            Work Entries
-          </NavLink>
+    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-black/90 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div>
+          <h1 className="text-sm font-semibold tracking-[0.18em] text-zinc-100 uppercase">
+            ShiftTrack
+          </h1>
         </div>
+
+        <nav className="flex items-center gap-2">
+          {links.map((link) => {
+            const isActive = location.pathname === link.to;
+
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`rounded-lg px-3 py-2 text-sm transition ${
+                  isActive
+                    ? "bg-zinc-100 text-black"
+                    : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
-    </nav>
+    </header>
   );
 }
+
+export default Navbar;
