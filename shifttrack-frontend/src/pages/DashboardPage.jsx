@@ -30,8 +30,29 @@ function DashboardPage() {
     }));
   }
 
-  async function fetchDashboardData() {
-    if (!filters.from || !filters.to) {
+  function handleQuickFilter(type) {
+    const today = new Date();
+    const fromDate = new Date();
+
+    if (type === "week") {
+      fromDate.setDate(today.getDate() - 7);
+    } else if (type === "fortnight") {
+      fromDate.setDate(today.getDate() - 14);
+    } else if (type === "month") {
+      fromDate.setMonth(today.getMonth() - 1);
+    }
+
+    const updatedFilters = {
+      from: fromDate.toISOString().split("T")[0],
+      to: today.toISOString().split("T")[0],
+    };
+
+    setFilters(updatedFilters);
+    fetchDashboardData(updatedFilters);
+  }
+
+  async function fetchDashboardData(currentFilters = filters) {
+    if (!currentFilters.from || !currentFilters.to) {
       setError("Please select both from and to dates.");
       return;
     }
@@ -43,14 +64,14 @@ function DashboardPage() {
       const [entriesResponse, summaryResponse] = await Promise.all([
         api.get("/work-entries/filter", {
           params: {
-            from: filters.from,
-            to: filters.to,
+            from: currentFilters.from,
+            to: currentFilters.to,
           },
         }),
         api.get("/reports/summary", {
           params: {
-            from: filters.from,
-            to: filters.to,
+            from: currentFilters.from,
+            to: currentFilters.to,
           },
         }),
       ]);
@@ -66,7 +87,7 @@ function DashboardPage() {
   }
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardData(filters);
   }, []);
 
   return (
@@ -86,7 +107,8 @@ function DashboardPage() {
           <DateFilter
             filters={filters}
             onChange={handleFilterChange}
-            onApply={fetchDashboardData}
+            onApply={() => fetchDashboardData(filters)}
+            onQuickFilter={handleQuickFilter}
           />
 
           {error && (
