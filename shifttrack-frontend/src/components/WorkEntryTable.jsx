@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -27,7 +28,7 @@ function formatHours(hours) {
   return `${Number(hours).toFixed(2)}`;
 }
 
-function WorkEntryTable({ entries }) {
+function WorkEntryTable({ entries, onEditEntry }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
       <CardHeader className="pb-4">
@@ -43,10 +44,10 @@ function WorkEntryTable({ entries }) {
             No work entries added yet.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-zinc-800">
-            <Table>
+          <div className=" max-h-[500px] overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-950">
+            <Table className="border-separate border-spacing-y-1">
               <TableHeader>
-                <TableRow className="border-zinc-800 bg-zinc-900 hover:bg-zinc-900">
+                <TableRow className="bg-zinc-950 border-b border-zinc-800">
                   <TableHead className="text-zinc-400">Date</TableHead>
                   <TableHead className="text-zinc-400">Company</TableHead>
                   <TableHead className="text-zinc-400">Start</TableHead>
@@ -55,6 +56,7 @@ function WorkEntryTable({ entries }) {
                   <TableHead className="text-right text-zinc-400">Hours</TableHead>
                   <TableHead className="text-right text-zinc-400">Pay</TableHead>
                   <TableHead className="text-zinc-400">Notes</TableHead>
+                  <TableHead className="text-right text-zinc-400 w-[110px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -62,7 +64,7 @@ function WorkEntryTable({ entries }) {
                 {entries.map((entry) => (
                   <TableRow
                     key={entry.id}
-                    className="border-zinc-800 hover:bg-zinc-900/40"
+                    className="border border-zinc-800 bg-zinc-950 hover:bg-zinc-900/60 transition-colors"
                   >
                     <TableCell>{entry.workDate || "-"}</TableCell>
                     <TableCell>
@@ -70,13 +72,13 @@ function WorkEntryTable({ entries }) {
                     </TableCell>
                     <TableCell>{entry.startTime || "-"}</TableCell>
                     <TableCell>{entry.endTime || "-"}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right font-medium tabular-nums">
                       {entry.breakHours ?? 0}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right font-medium tabular-nums">
                       {formatHours(entry.totalHours)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right font-medium tabular-nums">
                       {formatCurrency(entry.calculatedPay)}
                     </TableCell>
                     <TableCell>
@@ -86,6 +88,16 @@ function WorkEntryTable({ entries }) {
                       >
                         {entry.notes || "-"}
                       </span>
+                    </TableCell>
+                    <TableCell className="text-right font-medium tabular-nums">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => onEditEntry(entry)}
+                        className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+                      >
+                        Edit
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

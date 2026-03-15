@@ -5,6 +5,7 @@ import WorkEntryTable from "@/components/WorkEntryTable";
 
 function WorkEntriesPage() {
   const [entries, setEntries] = useState([]);
+  const [editingEntry, setEditingEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -34,6 +35,34 @@ function WorkEntriesPage() {
     }
   }
 
+  async function handleUpdateEntry(updatedEntry) {
+    try {
+      const response = await api.put(`/work-entries/${editingEntry.id}`, updatedEntry);
+
+      setEntries((prev) =>
+        prev.map((entry) =>
+          entry.id === editingEntry.id ? response.data : entry
+        )
+      );
+
+      setEditingEntry(null);
+      setError("");
+    } catch (err) {
+      console.error("Failed to update work entry:", err);
+      setError("Failed to update work entry.");
+      throw err;
+    }
+  }
+
+  function handleEditEntry(entry) {
+    setEditingEntry(entry);
+    setError("");
+  }
+
+  function handleCancelEdit() {
+    setEditingEntry(null);
+  }
+
   useEffect(() => {
     fetchEntries();
   }, []);
@@ -41,31 +70,63 @@ function WorkEntriesPage() {
   return (
     <div className="min-h-screen bg-black text-zinc-100">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <div className="mb-8">
-          <p className="mb-2 text-sm uppercase tracking-[0.2em] text-zinc-500">
-            ShiftTrack
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight">Work Entries</h1>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            Record daily shifts and view calculated hours and pay returned by the backend.
-          </p>
-        </div>
+        <div className="mb-10 border-b border-zinc-900 pb-6">
+  <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+    <div>
+      <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">
+        ShiftTrack
+      </p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
+        Work Entries
+      </h1>
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+        Add, edit, and review your recorded shifts in one place.
+      </p>
+    </div>
 
+    <div className="text-sm text-zinc-500">
+      {entries.length} {entries.length === 1 ? "entry" : "entries"}
+    </div>
+  </div>
+</div>
         {error && (
           <div className="mb-6 rounded-xl border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300">
             {error}
           </div>
         )}
 
-        <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
-          <WorkEntryForm onAddEntry={handleAddEntry} />
+        <div className="space-y-8">
+    {/* <div className="max-w-2xl"> */}
+          <WorkEntryForm
+            onAddEntry={handleAddEntry}
+            onUpdateEntry={handleUpdateEntry}
+            editingEntry={editingEntry}
+            onCancelEdit={handleCancelEdit}
+          />
+          {/* </div> */}
 
           {loading ? (
             <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-400">
               Loading work entries...
             </div>
           ) : (
-            <WorkEntryTable entries={entries} />
+            <div className="space-y-3">
+  <div>
+    <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">
+      History
+    </p>
+    <h2 className="mt-1 text-lg font-medium text-zinc-100">
+      Saved Work Entries
+    </h2>
+    <p className="mt-1 text-sm text-zinc-400">
+      Review previously recorded shifts and update them when needed.
+    </p>
+  </div>
+            <WorkEntryTable
+              entries={entries}
+              onEditEntry={handleEditEntry}
+            />
+            </div>
           )}
         </div>
       </div>

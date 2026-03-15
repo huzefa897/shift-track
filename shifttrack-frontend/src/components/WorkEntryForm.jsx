@@ -11,19 +11,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-function WorkEntryForm({ onAddEntry }) {
+const initialFormData = {
+  companyId: "",
+  workDate: "",
+  startTime: "",
+  endTime: "",
+  breakHours: "",
+  notes: "",
+};
+
+function WorkEntryForm({
+  onAddEntry,
+  onUpdateEntry,
+  editingEntry,
+  onCancelEdit,
+}) {
   const [companies, setCompanies] = useState([]);
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState({
-    companyId: "",
-    workDate: "",
-    startTime: "",
-    endTime: "",
-    breakHours: "",
-    notes: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => {
     async function fetchCompanies() {
@@ -39,6 +46,27 @@ function WorkEntryForm({ onAddEntry }) {
 
     fetchCompanies();
   }, []);
+
+  useEffect(() => {
+    if (editingEntry) {
+      setFormData({
+        companyId: String(
+          editingEntry.companyId ?? editingEntry.company?.id ?? ""
+        ),
+        workDate: editingEntry.workDate ?? "",
+        startTime: editingEntry.startTime ?? "",
+        endTime: editingEntry.endTime ?? "",
+        breakHours:
+          editingEntry.breakHours !== null &&
+          editingEntry.breakHours !== undefined
+            ? String(editingEntry.breakHours)
+            : "",
+        notes: editingEntry.notes ?? "",
+      });
+    } else {
+      setFormData(initialFormData);
+    }
+  }, [editingEntry]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -64,16 +92,13 @@ function WorkEntryForm({ onAddEntry }) {
     setSubmitting(true);
 
     try {
-      await onAddEntry(payload);
+      if (editingEntry) {
+        await onUpdateEntry(payload);
+      } else {
+        await onAddEntry(payload);
+      }
 
-      setFormData({
-        companyId: "",
-        workDate: "",
-        startTime: "",
-        endTime: "",
-        breakHours: "",
-        notes: "",
-      });
+      setFormData(initialFormData);
     } finally {
       setSubmitting(false);
     }
@@ -82,9 +107,13 @@ function WorkEntryForm({ onAddEntry }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl text-zinc-100">Add Work Entry</CardTitle>
+        <CardTitle className="text-xl text-zinc-100">
+          {editingEntry ? "Edit Work Entry" : "Add Work Entry"}
+        </CardTitle>
         <CardDescription className="text-zinc-400">
-          Record a shift for a selected company.
+          {editingEntry
+            ? "Update the selected shift."
+            : "Record a shift for a selected company."}
         </CardDescription>
       </CardHeader>
 
@@ -197,13 +226,30 @@ function WorkEntryForm({ onAddEntry }) {
             </div>
           </div>
 
-          <div className="flex justify-stretch md:justify-end">
+          <div className="flex flex-col gap-3 md:flex-row md:justify-end">
+            {editingEntry && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancelEdit}
+                className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+              >
+                Cancel
+              </Button>
+            )}
+
             <Button
               type="submit"
               disabled={submitting || loadingCompanies}
               className="w-full bg-white text-black hover:bg-zinc-200 md:w-auto"
             >
-              {submitting ? "Saving..." : "Save Entry"}
+              {submitting
+                ? editingEntry
+                  ? "Updating..."
+                  : "Saving..."
+                : editingEntry
+                ? "Update Entry"
+                : "Save Entry"}
             </Button>
           </div>
         </form>
