@@ -24,23 +24,23 @@ function formatCurrency(amount) {
 
 function formatHours(hours) {
   if (hours == null) return "-";
-  return `${Number(hours).toFixed(2)}`;
+  return Number(hours).toFixed(2);
 }
 
-function WorkEntryTable({ entries }) {
+function EntriesTable({ entries }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl text-zinc-100">Saved Work Entries</CardTitle>
+        <CardTitle className="text-xl text-zinc-100">Filtered Entries</CardTitle>
         <CardDescription className="text-zinc-400">
-          All recorded shifts returned by the backend.
+          Work entries matching the selected date range.
         </CardDescription>
       </CardHeader>
 
       <CardContent>
         {entries.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-sm text-zinc-400">
-            No work entries added yet.
+            No entries found for this date range.
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-zinc-800">
@@ -51,7 +51,6 @@ function WorkEntryTable({ entries }) {
                   <TableHead className="text-zinc-400">Company</TableHead>
                   <TableHead className="text-zinc-400">Start</TableHead>
                   <TableHead className="text-zinc-400">End</TableHead>
-                  <TableHead className="text-right text-zinc-400">Break</TableHead>
                   <TableHead className="text-right text-zinc-400">Hours</TableHead>
                   <TableHead className="text-right text-zinc-400">Pay</TableHead>
                   <TableHead className="text-zinc-400">Notes</TableHead>
@@ -70,9 +69,6 @@ function WorkEntryTable({ entries }) {
                     </TableCell>
                     <TableCell>{entry.startTime || "-"}</TableCell>
                     <TableCell>{entry.endTime || "-"}</TableCell>
-                    <TableCell className="text-right">
-                      {entry.breakHours ?? 0}
-                    </TableCell>
                     <TableCell className="text-right">
                       {formatHours(entry.totalHours)}
                     </TableCell>
@@ -98,4 +94,4 @@ function WorkEntryTable({ entries }) {
   );
 }
 
-export default WorkEntryTable;
+export default EntriesTable;

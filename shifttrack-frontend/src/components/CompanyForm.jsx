@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -50,18 +56,20 @@ function CompanyForm({ onAddCompany }) {
   }
 
   return (
-    <Card className="border-zinc-800 bg-zinc-950 text-zinc-100">
-      <CardHeader>
-        <CardTitle>Add Company</CardTitle>
+    <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl text-zinc-100">Add Company</CardTitle>
         <CardDescription className="text-zinc-400">
           Save a company and define weekday, Saturday, and Sunday rates.
         </CardDescription>
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit} className="grid gap-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-2">
-            <Label htmlFor="name">Company Name</Label>
+            <Label htmlFor="name" className="text-zinc-300">
+              Company Name
+            </Label>
             <Input
               id="name"
               name="name"
@@ -69,13 +77,15 @@ function CompanyForm({ onAddCompany }) {
               value={formData.name}
               onChange={handleChange}
               required
-              className="border-zinc-800 bg-zinc-900"
+              className="border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-1 xl:grid-cols-3">
             <div className="grid gap-2">
-              <Label htmlFor="weekdayRate">Weekday Rate</Label>
+              <Label htmlFor="weekdayRate" className="text-zinc-300">
+                Weekday Rate
+              </Label>
               <Input
                 id="weekdayRate"
                 name="weekdayRate"
@@ -85,12 +95,14 @@ function CompanyForm({ onAddCompany }) {
                 value={formData.weekdayRate}
                 onChange={handleChange}
                 required
-                className="border-zinc-800 bg-zinc-900"
+                className="border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="saturdayRate">Saturday Rate</Label>
+              <Label htmlFor="saturdayRate" className="text-zinc-300">
+                Saturday Rate
+              </Label>
               <Input
                 id="saturdayRate"
                 name="saturdayRate"
@@ -100,12 +112,14 @@ function CompanyForm({ onAddCompany }) {
                 value={formData.saturdayRate}
                 onChange={handleChange}
                 required
-                className="border-zinc-800 bg-zinc-900"
+                className="border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="sundayRate">Sunday Rate</Label>
+              <Label htmlFor="sundayRate" className="text-zinc-300">
+                Sunday Rate
+              </Label>
               <Input
                 id="sundayRate"
                 name="sundayRate"
@@ -115,16 +129,16 @@ function CompanyForm({ onAddCompany }) {
                 value={formData.sundayRate}
                 onChange={handleChange}
                 required
-                className="border-zinc-800 bg-zinc-900"
+                className="border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
               />
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-stretch md:justify-end">
             <Button
               type="submit"
               disabled={submitting}
-              className="bg-white text-black hover:bg-zinc-200"
+              className="w-full bg-white text-black hover:bg-zinc-200 md:w-auto"
             >
               {submitting ? "Saving..." : "Save Company"}
             </Button>
