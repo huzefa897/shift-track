@@ -22,6 +22,28 @@ function WorkEntriesPage() {
       setLoading(false);
     }
   }
+async function handleDeleteEntry(entryId) {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this work entry?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await api.delete(`/work-entries/${entryId}`);
+
+    setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+
+    if (editingEntry?.id === entryId) {
+      setEditingEntry(null);
+    }
+
+    setError("");
+  } catch (err) {
+    console.error("Failed to delete work entry:", err);
+    setError("Failed to delete work entry.");
+  }
+}
 
   async function handleAddEntry(newEntry) {
     try {
@@ -125,6 +147,7 @@ function WorkEntriesPage() {
             <WorkEntryTable
               entries={entries}
               onEditEntry={handleEditEntry}
+              onDeleteEntry={handleDeleteEntry}
             />
             </div>
           )}

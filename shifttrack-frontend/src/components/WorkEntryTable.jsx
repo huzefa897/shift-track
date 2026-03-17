@@ -28,7 +28,7 @@ function formatHours(hours) {
   return `${Number(hours).toFixed(2)}`;
 }
 
-function WorkEntryTable({ entries, onEditEntry }) {
+function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
       <CardHeader className="pb-4">
@@ -56,7 +56,9 @@ function WorkEntryTable({ entries, onEditEntry }) {
                   <TableHead className="text-right text-zinc-400">Hours</TableHead>
                   <TableHead className="text-right text-zinc-400">Pay</TableHead>
                   <TableHead className="text-zinc-400">Notes</TableHead>
-                  <TableHead className="text-right text-zinc-400 w-[110px]">Actions</TableHead>
+                  <TableHead className="w-[180px] text-right text-zinc-400">
+  Actions
+</TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -99,6 +101,27 @@ function WorkEntryTable({ entries, onEditEntry }) {
                         Edit
                       </Button>
                     </TableCell>
+                    <TableCell className="text-right">
+                 <div className="flex justify-end gap-2">
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() => onEditEntry(entry)}
+      className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+    >
+      Edit
+    </Button>
+
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() => onDeleteEntry(entry.id)}
+      className="border-red-900 bg-red-950/40 text-red-300 hover:bg-red-950/70 hover:text-red-200"
+    >
+      Delete
+    </Button>
+  </div>
+</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
