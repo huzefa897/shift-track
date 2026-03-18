@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface WorkEntryRepository extends JpaRepository<WorkEntry,Long> {
     List<WorkEntry> findByWorkDateBetween(LocalDate from, LocalDate to);
+    List<WorkEntry> findByWorkDateBetweenAndCompanyId(LocalDate from, LocalDate to, Long companyId);
 }

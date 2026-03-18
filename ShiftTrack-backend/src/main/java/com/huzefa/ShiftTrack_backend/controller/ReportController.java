@@ -21,9 +21,12 @@ public class ReportController {
     public ReportController(WorkEntryService workEntryService) {
         this.workEntryService = workEntryService;
     }
-
     @GetMapping("/summary")
-    public SummaryResponse getSummaryBetweenDates(@RequestParam LocalDate from,@RequestParam LocalDate to){
-        return workEntryService.getSummaryBetweenDates(from,to);
+    public SummaryResponse getSummary(
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to,
+            @RequestParam(required = false) Long companyId
+    ) {
+        return workEntryService.getSummaryBetweenDates(from, to, companyId);
     }
 }

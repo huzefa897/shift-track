@@ -33,10 +33,12 @@ public class WorkEntryController {
         return workEntryService.getWorkEntryById(id);
     }
     @GetMapping("/filter")
-    public List<WorkEntryResponse> getWorkEntriesBetweenDates(@RequestParam LocalDate from,
-                                                              @RequestParam LocalDate to){
-
-    return workEntryService.getWorkEntriesBetweenDates(from,to);
+    public List<WorkEntryResponse> getWorkEntriesBetweenDates(
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to,
+            @RequestParam(required = false) Long companyId
+    ) {
+        return workEntryService.getWorkEntriesBetweenDates(from, to, companyId);
     }
     @PutMapping("/{id}")
     public WorkEntryResponse updateWorkEntry(@PathVariable Long id,

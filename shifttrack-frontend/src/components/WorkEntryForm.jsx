@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "@/api/axios";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getAllCompanies } from "@/api/companyService";
 
 const initialFormData = {
   companyId: "",
@@ -26,26 +27,26 @@ function WorkEntryForm({
   editingEntry,
   onCancelEdit,
 }) {
-  const [companies, setCompanies] = useState([]);
-  const [loadingCompanies, setLoadingCompanies] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+const [companies, setCompanies] = useState([]);
+const [loadingCompanies, setLoadingCompanies] = useState(true);
+const [submitting, setSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState(initialFormData);
+const [formData, setFormData] = useState(initialFormData);
 
-  useEffect(() => {
-    async function fetchCompanies() {
-      try {
-        const response = await api.get("/companies");
-        setCompanies(response.data);
-      } catch (error) {
-        console.error("Failed to fetch companies:", error);
-      } finally {
-        setLoadingCompanies(false);
-      }
+useEffect(() => {
+  async function loadCompanies() {
+    try {
+      const response = await getAllCompanies();
+      setCompanies(response);
+    } catch (error) {
+      console.error("Failed to fetch companies:", error);
+    } finally {
+      setLoadingCompanies(false);
     }
+  }
 
-    fetchCompanies();
-  }, []);
+  loadCompanies();
+}, []);
 
   useEffect(() => {
     if (editingEntry) {
@@ -244,7 +245,7 @@ function WorkEntryForm({
   >
     {editingEntry ? "Update Entry" : "Save Entry"}
   </Button>
-</div>
+</div> 
         </form>
       </CardContent>
     </Card>
