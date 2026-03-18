@@ -226,32 +226,25 @@ function WorkEntryForm({
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 md:flex-row md:justify-end">
-            {editingEntry && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancelEdit}
-                className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-              >
-                Cancel
-              </Button>
-            )}
+        <div className="flex flex-col gap-3 md:flex-row md:justify-end">
+  {editingEntry && (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onCancelEdit}
+      className="border-red-900 bg-red-950/40 text-red-300 hover:bg-red-950/70"
+    >
+      Cancel Edit
+    </Button>
+  )}
 
-            <Button
-              type="submit"
-              disabled={submitting || loadingCompanies}
-              className="w-full bg-white text-black hover:bg-zinc-200 md:w-auto"
-            >
-              {submitting
-                ? editingEntry
-                  ? "Updating..."
-                  : "Saving..."
-                : editingEntry
-                ? "Update Entry"
-                : "Save Entry"}
-            </Button>
-          </div>
+  <Button
+    type="submit"
+    className="bg-white text-black hover:bg-zinc-200"
+  >
+    {editingEntry ? "Update Entry" : "Save Entry"}
+  </Button>
+</div>
         </form>
       </CardContent>
     </Card>

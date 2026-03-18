@@ -2,9 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -31,23 +28,16 @@ function formatHours(hours) {
 function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl text-zinc-100">Saved Work Entries</CardTitle>
-        <CardDescription className="text-zinc-400">
-          All recorded shifts returned by the backend.
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent>
+      <CardContent className="pt-6">
         {entries.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-sm text-zinc-400">
             No work entries added yet.
           </div>
         ) : (
-          <div className=" max-h-[500px] overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-950">
-            <Table className="border-separate border-spacing-y-1">
+          <div className="max-h-[500px] overflow-auto rounded-xl border border-zinc-800 bg-zinc-950">
+            <Table>
               <TableHeader>
-                <TableRow className="bg-zinc-950 border-b border-zinc-800">
+                <TableRow className="border-zinc-800 bg-zinc-900 hover:bg-zinc-900">
                   <TableHead className="text-zinc-400">Date</TableHead>
                   <TableHead className="text-zinc-400">Company</TableHead>
                   <TableHead className="text-zinc-400">Start</TableHead>
@@ -57,8 +47,8 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
                   <TableHead className="text-right text-zinc-400">Pay</TableHead>
                   <TableHead className="text-zinc-400">Notes</TableHead>
                   <TableHead className="w-[180px] text-right text-zinc-400">
-  Actions
-</TableHead>
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -66,7 +56,7 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
                 {entries.map((entry) => (
                   <TableRow
                     key={entry.id}
-                    className="border border-zinc-800 bg-zinc-950 hover:bg-zinc-900/60 transition-colors"
+                    className="border-zinc-800 hover:bg-zinc-900/40"
                   >
                     <TableCell>{entry.workDate || "-"}</TableCell>
                     <TableCell>
@@ -74,13 +64,13 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
                     </TableCell>
                     <TableCell>{entry.startTime || "-"}</TableCell>
                     <TableCell>{entry.endTime || "-"}</TableCell>
-                    <TableCell className="text-right font-medium tabular-nums">
+                    <TableCell className="text-right">
                       {entry.breakHours ?? 0}
                     </TableCell>
-                    <TableCell className="text-right font-medium tabular-nums">
+                    <TableCell className="text-right">
                       {formatHours(entry.totalHours)}
                     </TableCell>
-                    <TableCell className="text-right font-medium tabular-nums">
+                    <TableCell className="text-right">
                       {formatCurrency(entry.calculatedPay)}
                     </TableCell>
                     <TableCell>
@@ -91,37 +81,27 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
                         {entry.notes || "-"}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right font-medium tabular-nums">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => onEditEntry(entry)}
-                        className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
                     <TableCell className="text-right">
-                 <div className="flex justify-end gap-2">
-    <Button
-      type="button"
-      variant="outline"
-      onClick={() => onEditEntry(entry)}
-      className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-    >
-      Edit
-    </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => onEditEntry(entry)}
+                          className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+                        >
+                          Edit
+                        </Button>
 
-    <Button
-      type="button"
-      variant="outline"
-      onClick={() => onDeleteEntry(entry.id)}
-      className="border-red-900 bg-red-950/40 text-red-300 hover:bg-red-950/70 hover:text-red-200"
-    >
-      Delete
-    </Button>
-  </div>
-</TableCell>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => onDeleteEntry(entry)}
+                          className="border-red-900 bg-red-950/40 text-red-300 hover:bg-red-950/70 hover:text-red-200"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
