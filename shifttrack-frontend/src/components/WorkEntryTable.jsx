@@ -39,14 +39,17 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
       </CardHeader>
 
       <CardContent>
-        {entries.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-sm text-zinc-400">
-            No work entries added yet.
-          </div>
-        ) : (
-          <div className=" max-h-[500px] overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-950">
+      {entries.length === 0 ? (
+  <div className="flex flex-col items-center justify-center gap-2 py-12 text-zinc-400">
+    <p className="text-sm">No work entries yet</p>
+    <p className="text-xs text-zinc-500">
+      Add your first entry using the form above
+    </p>
+  </div>
+) : (
+<div className="max-h-[520px] overflow-auto rounded-xl border border-zinc-800 bg-zinc-950" style={{ scrollbarWidth: "thin" }}>
             <Table className="border-separate border-spacing-y-1">
-              <TableHeader>
+              <TableHeader className="sticky top-0 z-10 bg-zinc-900">
                 <TableRow className="bg-zinc-950 border-b border-zinc-800">
                   <TableHead className="text-zinc-400">Date</TableHead>
                   <TableHead className="text-zinc-400">Company</TableHead>
