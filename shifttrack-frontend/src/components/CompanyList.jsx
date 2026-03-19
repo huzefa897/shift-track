@@ -5,6 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -13,6 +14,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 function formatCurrency(amount) {
   return new Intl.NumberFormat("en-AU", {
@@ -21,7 +33,7 @@ function formatCurrency(amount) {
   }).format(Number(amount || 0));
 }
 
-function CompanyList({ companies }) {
+function CompanyList({ companies, onEdit, onDelete }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
       <CardHeader className="pb-4">
@@ -51,6 +63,9 @@ function CompanyList({ companies }) {
                   <TableHead className="text-right text-zinc-400">
                     Sunday
                   </TableHead>
+                  <TableHead className="text-right text-zinc-400">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -71,6 +86,56 @@ function CompanyList({ companies }) {
                     </TableCell>
                     <TableCell className="text-right">
                       {formatCurrency(company.sundayRate)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => onEdit(company)}
+                          className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+                        >
+                          Edit
+                        </Button>
+                       <AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button
+      type="button"
+      variant="destructive"
+    >
+      Delete
+    </Button>
+  </AlertDialogTrigger>
+
+  <AlertDialogContent className="border-zinc-800 bg-zinc-950 text-zinc-100">
+    <AlertDialogHeader>
+      <AlertDialogTitle>
+        Delete Company
+      </AlertDialogTitle>
+      <AlertDialogDescription className="text-zinc-400">
+        Are you sure you want to delete{" "}
+        <span className="font-medium text-zinc-200">
+          {company.name}
+        </span>
+        ? This action cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+
+    <AlertDialogFooter>
+      <AlertDialogCancel className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800">
+        Cancel
+      </AlertDialogCancel>
+
+      <AlertDialogAction
+        onClick={() => onDelete(company.id)}
+        className="bg-red-600 text-white hover:bg-red-500"
+      >
+        Delete
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
