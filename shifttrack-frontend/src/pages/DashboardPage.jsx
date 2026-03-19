@@ -10,11 +10,17 @@ import EntriesTable from "@/components/EntriesTable";
 
 function DashboardPage() {
   const today = new Date().toISOString().split("T")[0];
-  const[companies, setCompanies] = useState([]);
+
+  const [companies, setCompanies] = useState([]);
   const [filters, setFilters] = useState({
     from: today,
     to: today,
-     companyId: "",
+    companyId: "",
+  });
+
+  const [sortConfig, setSortConfig] = useState({
+    key: "workDate",
+    direction: "desc",
   });
 
   const [summary, setSummary] = useState({
@@ -34,14 +40,15 @@ function DashboardPage() {
       [name]: value,
     }));
   }
+
   async function loadCompanies() {
-  try {
-    const companiesData = await fetchCompanies();
-    setCompanies(companiesData);
-  } catch (err) {
-    console.error("Failed to load companies:", err);
+    try {
+      const companiesData = await fetchCompanies();
+      setCompanies(companiesData);
+    } catch (err) {
+      console.error("Failed to load companies:", err);
+    }
   }
-}
 
   function handleQuickFilter(type) {
     const today = new Date();
@@ -56,6 +63,7 @@ function DashboardPage() {
     }
 
     const updatedFilters = {
+      ...filters,
       from: fromDate.toISOString().split("T")[0],
       to: today.toISOString().split("T")[0],
     };
@@ -64,35 +72,49 @@ function DashboardPage() {
     fetchDashboardData(updatedFilters);
   }
 
- async function fetchDashboardData(currentFilters = filters) {
-  if (!currentFilters.from || !currentFilters.to) {
-    setError("Please select both from and to dates.");
-    return;
+  async function fetchDashboardData(currentFilters = filters) {
+    if (!currentFilters.from || !currentFilters.to) {
+      setError("Please select both from and to dates.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const [entriesData, summaryData] = await Promise.all([
+        fetchFilteredWorkEntries(currentFilters),
+        fetchSummary(currentFilters),
+      ]);
+
+      setEntries(entriesData);
+      setSummary(summaryData);
+    } catch (err) {
+      console.error("Failed to load dashboard data:", err);
+      setError("Failed to load dashboard data.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  try {
-    setLoading(true);
-    setError("");
+  useEffect(() => {
+    loadCompanies();
+    fetchDashboardData(filters);
+  }, []);
 
-    const [entriesData, summaryData] = await Promise.all([
-      fetchFilteredWorkEntries(currentFilters),
-      fetchSummary(currentFilters),
-    ]);
+  const sortedEntries = [...entries].sort((a, b) => {
+    let valueA = a[sortConfig.key];
+    let valueB = b[sortConfig.key];
 
-    setEntries(entriesData);
-    setSummary(summaryData);
-  } catch (err) {
-    console.error("Failed to load dashboard data:", err);
-    setError("Failed to load dashboard data.");
-  } finally {
-    setLoading(false);
-  }
-}
+    if (sortConfig.key === "company") {
+      valueA = a.company?.name?.toLowerCase() || "";
+      valueB = b.company?.name?.toLowerCase() || "";
+    }
 
- useEffect(() => {
-  loadCompanies();
-  fetchDashboardData(filters);
-}, []);
+    if (valueA < valueB) return sortConfig.direction === "asc" ? -1 : 1;
+    if (valueA > valueB) return sortConfig.direction === "asc" ? 1 : -1;
+    return 0;
+  });
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -114,19 +136,47 @@ function DashboardPage() {
             onApply={() => fetchDashboardData(filters)}
             onQuickFilter={handleQuickFilter}
           />
-                <select
-        name="companyId"
-        value={filters.companyId}
-        onChange={handleFilterChange}
-        className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-600 disabled:opacity-60"
-      >
-        <option value="">All Companies</option>
-        {companies.map((company) => (
-          <option key={company.id} value={company.id}>
-            {company.name}
-          </option>
-        ))}
-      </select>
+
+          <select
+            name="companyId"
+            value={filters.companyId}
+            onChange={handleFilterChange}
+            className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-600 disabled:opacity-60"
+          >
+            <option value="">All Companies</option>
+            {companies.map((company) => (
+              <option key={company.id} value={company.id}>
+                {company.name}
+              </option>
+            ))}
+          </select>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSortConfig({ key: "workDate", direction: "desc" })}
+              className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
+            >
+              Latest Date
+            </button>
+            <button
+              onClick={() => setSortConfig({ key: "calculatedPay", direction: "desc" })}
+              className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
+            >
+              Highest Pay
+            </button>
+            <button
+              onClick={() => setSortConfig({ key: "totalHours", direction: "desc" })}
+              className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
+            >
+              Highest Hours
+            </button>
+            <button
+              onClick={() => setSortConfig({ key: "company", direction: "asc" })}
+              className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
+            >
+              Company A-Z
+            </button>
+          </div>
 
           {error && (
             <div className="rounded-xl border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300">
@@ -141,7 +191,7 @@ function DashboardPage() {
           ) : (
             <>
               <SummaryCards summary={summary} />
-              <EntriesTable entries={entries} />
+              <EntriesTable entries={sortedEntries} />
             </>
           )}
         </div>
