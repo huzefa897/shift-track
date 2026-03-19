@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -28,15 +31,24 @@ function formatHours(hours) {
 function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
-      <CardContent className="pt-6">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl text-zinc-100">Saved Work Entries</CardTitle>
+        <CardDescription className="text-zinc-400">
+          All recorded shifts returned by the backend.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         {entries.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-sm text-zinc-400">
-            No work entries added yet.
+          <div className="flex flex-col items-center justify-center gap-2 py-12 text-zinc-400">
+            <p className="text-sm">No work entries yet</p>
+            <p className="text-xs text-zinc-500">
+              Add your first entry using the form above
+            </p>
           </div>
         ) : (
-          <div className="max-h-[500px] overflow-auto rounded-xl border border-zinc-800 bg-zinc-950">
-            <Table>
-              <TableHeader>
+          <div className="max-h-[520px] overflow-auto rounded-xl border border-zinc-800 bg-zinc-950" style={{ scrollbarWidth: "thin" }}>
+            <Table className="border-separate border-spacing-y-1">
+              <TableHeader className="sticky top-0 z-10 bg-zinc-900">
                 <TableRow className="border-zinc-800 bg-zinc-900 hover:bg-zinc-900">
                   <TableHead className="text-zinc-400">Date</TableHead>
                   <TableHead className="text-zinc-400">Company</TableHead>

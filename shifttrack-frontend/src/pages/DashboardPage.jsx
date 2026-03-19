@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
-import api from "@/api/axios";
+import {
+  fetchCompanies,
+  fetchFilteredWorkEntries,
+  fetchSummary,
+} from "@/api/dashboardApi";
 import DateFilter from "@/components/DateFilter";
 import SummaryCards from "@/components/SummaryCards";
 import EntriesTable from "@/components/EntriesTable";
 
 function DashboardPage() {
   const today = new Date().toISOString().split("T")[0];
-
+  const[companies, setCompanies] = useState([]);
   const [filters, setFilters] = useState({
     from: today,
     to: today,
+     companyId: "",
   });
 
   const [summary, setSummary] = useState({
@@ -29,6 +34,14 @@ function DashboardPage() {
       [name]: value,
     }));
   }
+  async function loadCompanies() {
+  try {
+    const companiesData = await fetchCompanies();
+    setCompanies(companiesData);
+  } catch (err) {
+    console.error("Failed to load companies:", err);
+  }
+}
 
   function handleQuickFilter(type) {
     const today = new Date();
@@ -51,44 +64,35 @@ function DashboardPage() {
     fetchDashboardData(updatedFilters);
   }
 
-  async function fetchDashboardData(currentFilters = filters) {
-    if (!currentFilters.from || !currentFilters.to) {
-      setError("Please select both from and to dates.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError("");
-
-      const [entriesResponse, summaryResponse] = await Promise.all([
-        api.get("/work-entries/filter", {
-          params: {
-            from: currentFilters.from,
-            to: currentFilters.to,
-          },
-        }),
-        api.get("/reports/summary", {
-          params: {
-            from: currentFilters.from,
-            to: currentFilters.to,
-          },
-        }),
-      ]);
-
-      setEntries(entriesResponse.data);
-      setSummary(summaryResponse.data);
-    } catch (err) {
-      console.error("Failed to load dashboard data:", err);
-      setError("Failed to load dashboard data.");
-    } finally {
-      setLoading(false);
-    }
+ async function fetchDashboardData(currentFilters = filters) {
+  if (!currentFilters.from || !currentFilters.to) {
+    setError("Please select both from and to dates.");
+    return;
   }
 
-  useEffect(() => {
-    fetchDashboardData(filters);
-  }, []);
+  try {
+    setLoading(true);
+    setError("");
+
+    const [entriesData, summaryData] = await Promise.all([
+      fetchFilteredWorkEntries(currentFilters),
+      fetchSummary(currentFilters),
+    ]);
+
+    setEntries(entriesData);
+    setSummary(summaryData);
+  } catch (err) {
+    console.error("Failed to load dashboard data:", err);
+    setError("Failed to load dashboard data.");
+  } finally {
+    setLoading(false);
+  }
+}
+
+ useEffect(() => {
+  loadCompanies();
+  fetchDashboardData(filters);
+}, []);
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -110,6 +114,19 @@ function DashboardPage() {
             onApply={() => fetchDashboardData(filters)}
             onQuickFilter={handleQuickFilter}
           />
+                <select
+        name="companyId"
+        value={filters.companyId}
+        onChange={handleFilterChange}
+        className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-600 disabled:opacity-60"
+      >
+        <option value="">All Companies</option>
+        {companies.map((company) => (
+          <option key={company.id} value={company.id}>
+            {company.name}
+          </option>
+        ))}
+      </select>
 
           {error && (
             <div className="rounded-xl border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300">

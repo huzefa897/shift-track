@@ -126,19 +126,31 @@ public class WorkEntryService {
         workEntryRepository.delete(workEntry);
     }
 
-    public List<WorkEntryResponse> getWorkEntriesBetweenDates(LocalDate from, LocalDate to) {
+    public List<WorkEntryResponse> getWorkEntriesBetweenDates(LocalDate from, LocalDate to,Long companyId) {
         validateDateRange(from, to);
+        List<WorkEntry> entries;
 
-        return workEntryRepository.findByWorkDateBetween(from, to)
-                .stream()
+        if (companyId != null) {
+            entries = workEntryRepository.findByWorkDateBetweenAndCompanyId(from, to, companyId);
+        } else {
+            entries = workEntryRepository.findByWorkDateBetween(from, to);
+        }
+
+        return entries.stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    public SummaryResponse getSummaryBetweenDates(LocalDate from, LocalDate to) {
+    public SummaryResponse getSummaryBetweenDates(LocalDate from, LocalDate to, Long companyId) {
         validateDateRange(from, to);
 
-        List<WorkEntry> entries = workEntryRepository.findByWorkDateBetween(from, to);
+        List<WorkEntry> entries;
+
+        if (companyId != null) {
+            entries = workEntryRepository.findByWorkDateBetweenAndCompanyId(from, to, companyId);
+        } else {
+            entries = workEntryRepository.findByWorkDateBetween(from, to);
+        }
 
         BigDecimal totalHours = entries.stream()
                 .map(WorkEntry::getTotalHours)
