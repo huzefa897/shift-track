@@ -1,17 +1,66 @@
-# Phase 1 Day-by-Day Roadmap
+Yes — here’s the **remade ShiftTrack roadmap** using your existing roadmap from the file, but updated with the **GitHub branching workflow** and with **Completed** marked on the parts you’ve already finished. The original roadmap covers Phase 1 backend, Phase 2 frontend, and the next phases from Product Improvements onward.
 
-## Day 1 — Project setup
+# ShiftTrack Roadmap — Updated with GitHub Workflow
 
-Goal: app runs and connects to database.
+## GitHub workflow rule for the whole project
+
+Do **not** create one branch per phase.
+
+Create **one branch per feature/day task**.
+
+Branch naming style:
+
+```bash
+feature/<task-name>
+```
+
+Examples:
+
+```bash
+feature/company-module
+feature/work-entry-module
+feature/dashboard-page
+feature/quick-filters
+feature/edit-work-entry
+feature/docker-setup
+```
+
+Recommended flow for every task:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/<task-name>
+# do the work
+git add .
+git commit -m "feat: <what you built>"
+git checkout main
+git merge feature/<task-name>
+```
+
+---
+
+# Phase 1 — Backend Foundation
+
+Goal: create a stable backend that stores companies and work entries.
+
+## Day 1 — Project Setup — **Completed**
+
+Suggested branch:
+
+```bash
+feature/backend-project-setup
+```
 
 Tasks:
 
 - create Spring Boot project
 - add dependencies
-- configure PostgreSQL in `application.properties`
+- configure PostgreSQL
 - run app successfully
 - verify DB connection
 - create base package structure
+- add health endpoint
 
 Deliverable:
 
@@ -19,9 +68,13 @@ Deliverable:
 
 ---
 
-## Day 2 — Company module
+## Day 2 — Company Module — **Completed**
 
-Goal: company CRUD basics done.
+Suggested branch:
+
+```bash
+feature/company-module
+```
 
 Tasks:
 
@@ -36,13 +89,17 @@ Tasks:
 
 Deliverable:
 
-- you can save and fetch companies in Postman
+- companies can be saved and fetched
 
 ---
 
-## Day 3 — WorkEntry module structure
+## Day 3 — WorkEntry Module Structure — **Completed**
 
-Goal: save work entries linked to company.
+Suggested branch:
+
+```bash
+feature/work-entry-module
+```
 
 Tasks:
 
@@ -52,7 +109,6 @@ Tasks:
 - create `WorkEntryService`
 - create `WorkEntryController`
 - create request/response DTOs
-- save entry without calculation first if needed
 
 Deliverable:
 
@@ -60,15 +116,19 @@ Deliverable:
 
 ---
 
-## Day 4 — Hours and pay calculation
+## Day 4 — Hours and Pay Calculation — **Completed**
 
-Goal: business logic works.
+Suggested branch:
+
+```bash
+feature/pay-calculation
+```
 
 Tasks:
 
 - create `PayCalculationService`
 - calculate `totalHours`
-- determine weekday/saturday/sunday rate
+- determine weekday / saturday / sunday rate
 - calculate `calculatedPay`
 - plug this into work entry creation flow
 - test with multiple dates
@@ -79,9 +139,13 @@ Deliverable:
 
 ---
 
-## Day 5 — Filtering and summary
+## Day 5 — Filtering and Summary — **Completed**
 
-Goal: reports start working.
+Suggested branch:
+
+```bash
+feature/filter-and-summary
+```
 
 Tasks:
 
@@ -89,10 +153,7 @@ Tasks:
 - create `GET /api/work-entries/filter`
 - create `SummaryResponse`
 - create `GET /api/reports/summary`
-- calculate:
-    - total hours
-    - total pay
-    - total entries
+- calculate total hours, total pay, total entries
 
 Deliverable:
 
@@ -100,9 +161,13 @@ Deliverable:
 
 ---
 
-## Day 6 — Exception handling and cleanup
+## Day 6 — Exception Handling and Cleanup — **Completed**
 
-Goal: make project more professional.
+Suggested branch:
+
+```bash
+feature/exception-handling
+```
 
 Tasks:
 
@@ -111,7 +176,7 @@ Tasks:
 - handle invalid company id
 - handle invalid work entry data
 - clean service/controller code
-- improve response structure if needed
+- improve response structure
 
 Deliverable:
 
@@ -119,9 +184,13 @@ Deliverable:
 
 ---
 
-## Day 7 — Backend testing and polish
+## Day 7 — Backend Testing and Polish — **Completed**
 
-Goal: phase 1 backend complete.
+Suggested branch:
+
+```bash
+feature/backend-polish
+```
 
 Tasks:
 
@@ -132,6 +201,7 @@ Tasks:
 - verify date filters
 - fix edge cases
 - prepare for frontend
+- add/update/delete endpoints if missing
 
 Deliverable:
 
@@ -139,508 +209,120 @@ Deliverable:
 
 ---
 
-# Frontend Phase 1 Plan
-
-After backend is stable, frontend should be very simple.
-
-## Pages
-
-### 1. Companies page
-
-- form to add company
-- list existing companies
-
-### 2. Work Entries page
-
-- form to add work entry
-- dropdown for company
-- table of entries
-
-### 3. Summary page / Dashboard
-
-- from date
-- to date
-- total hours card
-- total pay card
-- entries count card
-
-That’s enough.
-
----
-
-# Order of coding inside backend
-
-This matters a lot. Do it in this order:
-
-## First
-
-- setup project
-- database connection
-
-## Then
-
-- Company entity → repository → service → controller
-
-## Then
-
-- WorkEntry entity → repository → service → controller
-
-## Then
-
-- PayCalculationService
-
-## Then
-
-- filter and summary endpoints
-
-## Then
-
-- exception handling
-
-Do not jump around randomly.
-
-# Definition of “Phase 1 complete”
-
-Phase 1 is done when all these are true:
-
-- company can be created
-- work entry can be created
-- pay is auto-calculated correctly
-- entries can be listed
-- entries can be filtered by from/to date
-- summary totals work
-- backend tested in Postman
-
-That’s it. Don’t move the goalpost.
-
-# Project: ShiftTrack
-
-A personal application to record work shifts for different companies and automatically calculate pay based on weekday, Saturday, and Sunday rates.
-
-The application will allow:
-
-- recording work shifts
-- managing companies and pay rates
-- calculating pay automatically
-- filtering work data by time ranges
-- viewing summaries of hours and income
-
-Later phases will introduce analytics, UI improvements, and optional automation features.
-
----
-
-# Tech Stack
-
-### Backend
-
-Spring Boot
-
-PostgreSQL
-
-Spring Data JPA
-
-Bean Validation
-
-JUnit (testing)
-
-### Frontend
-
-React
-
-Vite
-
-Tailwind CSS
-
-Axios
-
-React Router
-
-### DevOps (later phases)
-
-Docker
-
-Docker Compose
-
----
-
-# Development Philosophy
-
-The project will be built in **incremental phases**:
-
-1. Backend foundation
-2. Backend business logic
-3. Backend polish
-4. Frontend core UI
-5. Frontend usability
-6. Product-level improvements
-
-Each phase contains **small daily milestones**.
-
----
-
-# Phase 1 — Backend Foundation
-
-Goal: create a stable backend that stores companies and work entries.
-
-### Day 1 — Project Setup
-
-Create Spring Boot project
-
-Setup:
-
-```
-Spring Web
-Spring Data JPA
-PostgreSQL
-Validation
-Lombok
-```
-
-Configure:
-
-```
-application.yml
-database connection
-```
-
-Create base project structure:
-
-```
-controller
-service
-repository
-entity
-dto
-```
-
-Add:
-
-```
-HealthController
-```
-
-Test endpoint:
-
-```
-GET /api/health
-```
-
----
-
-### Day 2 — Company Entity
-
-Create:
-
-```
-Company
-```
-
-Fields:
-
-```
-id
-name
-weekdayRate
-saturdayRate
-sundayRate
-createdAt
-```
-
-Create:
-
-```
-CompanyRepository
-CompanyService
-CompanyController
-```
-
-Endpoints:
-
-```
-POST /companies
-GET /companies
-GET /companies/{id}
-```
-
----
-
-### Day 3 — WorkEntry Entity
-
-Create:
-
-```
-WorkEntry
-```
-
-Fields:
-
-```
-id
-workDate
-startTime
-endTime
-breakHours
-totalHours
-calculatedPay
-notes
-company
-```
-
-Relationship:
-
-```
-ManyToOne -> Company
-```
-
-Create:
-
-```
-WorkEntryRepository
-WorkEntryService
-WorkEntryController
-```
-
-Endpoints:
-
-```
-POST /work-entries
-GET /work-entries
-GET /work-entries/{id}
-```
-
----
-
-### Day 4 — Pay Calculation Logic
-
-Create:
-
-```
-PayCalculationService
-```
-
-Responsibilities:
-
-Determine rate depending on day:
-
-```
-Weekday -> weekdayRate
-Saturday -> saturdayRate
-Sunday -> sundayRate
-```
-
-Calculate:
-
-```
-totalHours
-pay = hours × rate
-```
-
-Integrate into `WorkEntryService`.
-
----
-
-### Day 5 — Date Filtering
-
-Add query methods:
-
-```
-findByWorkDateBetween()
-```
-
-Endpoints:
-
-```
-GET /work-entries/filter?from=&to=
-```
-
-Create:
-
-```
-SummaryResponse
-```
-
-Endpoint:
-
-```
-GET /reports/summary
-```
-
-Returns:
-
-```
-totalHours
-totalPay
-totalEntries
-```
-
----
-
-### Day 6 — Error Handling
-
-Add global exception handling.
-
-Create:
-
-```
-ResourceNotFoundException
-GlobalExceptionHandler
-ErrorResponse
-```
-
-Return proper HTTP statuses:
-
-```
-404
-400
-500
-```
-
-Add validation to DTOs.
-
----
-
-### Day 7 — Backend Polish
-
-Add missing CRUD operations.
-
-Endpoints:
-
-```
-PUT /companies/{id}
-DELETE /companies/{id}
-
-PUT /work-entries/{id}
-DELETE /work-entries/{id}
-```
-
-Improve validation.
-
-Add service-level checks.
-
----
-
 # Phase 2 — Frontend Core
 
 Goal: create a working UI that talks to backend.
 
----
+## FE Day 1 — Frontend Setup — **Completed**
 
-### FE Day 1 — Frontend Setup
+Suggested branch:
 
-Create React app using Vite.
-
-Install:
-
-```
-axios
-react-router-dom
-tailwindcss
+```bash
+feature/frontend-setup
 ```
 
-Create structure:
+Tasks:
 
-```
-components
-pages
-api
-```
+- create React app using Vite
+- install `axios`, `react-router-dom`, `tailwindcss`
+- create structure: `components`, `pages`, `api`
+- create `DashboardPage`, `CompaniesPage`, `WorkEntriesPage`
+- create `Navbar`
 
-Create pages:
+Deliverable:
 
-```
-DashboardPage
-CompaniesPage
-WorkEntriesPage
-```
-
-Create:
-
-```
-Navbar
-```
+- frontend app structure is ready
 
 ---
 
-### FE Day 2 — Companies Page
+## FE Day 2 — Companies Page — **Completed**
 
-Build:
+Suggested branch:
 
-```
-CompanyForm
-CompanyList
-```
-
-Features:
-
-```
-Create company
-Fetch companies
-Display companies
+```bash
+feature/companies-page
 ```
 
-Connect to backend.
+Tasks:
+
+- build `CompanyForm`
+- build `CompanyList`
+- create company
+- fetch companies
+- display companies
+- connect to backend
+
+Deliverable:
+
+- companies page works end-to-end
 
 ---
 
-### FE Day 3 — Work Entries Page
+## FE Day 3 — Work Entries Page — **Completed**
 
-Build:
+Suggested branch:
 
-```
-WorkEntryForm
-WorkEntryTable
+```bash
+feature/work-entries-page
 ```
 
-Features:
+Tasks:
 
-```
-Select company
-Enter shift details
-Calculate pay via backend
-Display entries
-```
+- build `WorkEntryForm`
+- build `WorkEntryTable`
+- select company
+- enter shift details
+- calculate pay via backend
+- display entries
+
+Deliverable:
+
+- work entries page works end-to-end
 
 ---
 
-### FE Day 4 — Dashboard
+## FE Day 4 — Dashboard — **Completed**
 
-Create:
+Suggested branch:
 
-```
-SummaryCards
-DateFilter
-EntriesTable
+```bash
+feature/dashboard-page
 ```
 
-Features:
+Tasks:
 
-```
-Filter by date range
-Show totals
-Show filtered entries
-```
+- create `SummaryCards`
+- create `DateFilter`
+- create `EntriesTable`
+- filter by date range
+- show totals
+- show filtered entries
+
+Deliverable:
+
+- dashboard works with backend data
 
 ---
 
-### FE Day 5 — UI Improvements
+## FE Day 5 — UI Improvements — **Completed**
 
-Improve design:
+Suggested branch:
 
-```
-Apple-style minimal UI
-Better spacing
-Better cards
-Cleaner typography
+```bash
+feature/ui-improvements
 ```
 
-Introduce reusable components:
+Tasks:
 
-```
-Card
-Input
-Button
-SectionHeader
-```
+- improve design
+- better spacing
+- better cards
+- cleaner typography
+- reusable UI components like `Card`, `Input`, `Button`, `SectionHeader`
+
+Deliverable:
+
+- UI looks clean and reusable
 
 ---
 
@@ -648,52 +330,109 @@ SectionHeader
 
 Goal: make the app actually useful daily.
 
----
+## Day 1 — Better Filtering — **Next**
 
-### Day 1 — Better Filtering
+Suggested branch:
 
-Add filters:
-
-```
-Last week
-Last fortnight
-Last month
+```bash
+feature/quick-filters
 ```
 
----
+Tasks:
 
-### Day 2 — Editing Entries
+- add preset filters:
+    - last week
+    - last fortnight
+    - last month
+- connect presets to dashboard date state
+- refetch entries and summary automatically
 
-Allow:
+Deliverable:
 
-```
-Edit work entry
-Inline editing
-```
-
----
-
-### Day 3 — Deleting Entries
-
-Add confirmation modals.
+- user can filter quickly without manually picking dates
 
 ---
 
-### Day 4 — Sorting
+## Day 2 — Editing Entries
 
-Sort by:
+Suggested branch:
 
+```bash
+feature/edit-work-entry
 ```
-Date
-Company
-Pay
-```
+
+Tasks:
+
+- add edit action in table
+- reuse `WorkEntryForm` in edit mode
+- prefill data
+- call `PUT /work-entries/{id}`
+
+Deliverable:
+
+- user can update an existing entry
 
 ---
 
-### Day 5 — Pagination
+## Day 3 — Deleting Entries
 
-Handle large datasets.
+Suggested branch:
+
+```bash
+feature/delete-work-entry
+```
+
+Tasks:
+
+- add delete action in table
+- confirmation modal
+- call `DELETE /work-entries/{id}`
+
+Deliverable:
+
+- user can safely delete entries
+
+---
+
+## Day 4 — Sorting
+
+Suggested branch:
+
+```bash
+feature/sort-entries
+```
+
+Tasks:
+
+- sort by:
+    - date
+    - company
+    - pay
+- optionally add hours sorting too
+
+Deliverable:
+
+- entries are easier to scan and use
+
+---
+
+## Day 5 — Pagination
+
+Suggested branch:
+
+```bash
+feature/pagination
+```
+
+Tasks:
+
+- handle large datasets
+- add page navigation
+- optionally move pagination to backend later
+
+Deliverable:
+
+- entries table scales better
 
 ---
 
@@ -701,23 +440,25 @@ Handle large datasets.
 
 Goal: visualize work data.
 
----
+Suggested branch options:
 
-### Features
-
-Charts:
-
-```
-Weekly income
-Hours worked
-Income per company
+```bash
+feature/weekly-income-chart
+feature/hours-worked-chart
+feature/company-income-chart
 ```
 
-Libraries:
+Tasks:
 
-```
-Recharts
-```
+- add charts for:
+    - weekly income
+    - hours worked
+    - income per company
+- use `Recharts`
+
+Deliverable:
+
+- dashboard becomes portfolio-level, not just CRUD
 
 ---
 
@@ -725,32 +466,42 @@ Recharts
 
 Goal: production-ready app.
 
----
+## Docker
 
-### Docker
+Suggested branches:
 
-Create:
-
-```
-Dockerfile backend
-Dockerfile frontend
-docker-compose
+```bash
+feature/backend-dockerfile
+feature/frontend-dockerfile
+feature/docker-compose
 ```
 
-Run full stack with one command.
+Tasks:
 
----
+- create backend Dockerfile
+- create frontend Dockerfile
+- create docker-compose
+- run full stack with one command
 
-### Deployment
+Deliverable:
 
-Possible options:
+- project runs in containers
 
+## Deployment
+
+Suggested branches:
+
+```bash
+feature/deployment-config
 ```
-Render
-Railway
-Fly.io
-AWS
-```
+
+Tasks:
+
+- prepare deployment for Render / Railway / Fly.io / AWS
+
+Deliverable:
+
+- app is deployable
 
 ---
 
@@ -758,493 +509,114 @@ AWS
 
 Optional future features.
 
----
+Suggested branches:
 
-### Mobile optimization
-
-Better responsive layout.
-
----
-
-### Export
-
-Export work logs to:
-
-```
-CSV
-PDF
+```bash
+feature/mobile-optimization
+feature/export-csv
+feature/export-pdf
+feature/google-calendar-integration
+feature-timesheet-import
 ```
 
----
+Tasks:
 
-### Automation
+- mobile optimization
+- export to CSV/PDF
+- automation integrations
 
-Possible integrations:
+Deliverable:
 
-```
-Google Calendar
-Timesheet imports
-```
+- advanced real-world usefulness
 
 ---
 
-# Final Folder Structure (Backend)
+# Current status summary
 
+## Completed
+
+- Phase 1 backend
+- Phase 2 frontend
+
+## Current next task
+
+- **Phase 3 Day 1 — Better Filtering**
+- Branch to create:
+
+```bash
+git checkout -b feature/quick-filters
 ```
-shifttrack-backend
-│
-├── controller
-├── service
-├── repository
-├── entity
-├── dto
-├── exception
-└── config
-```
+
+## After that
+
+- `feature/edit-work-entry`
+- `feature/delete-work-entry`
+- `feature/sort-entries`
+- `feature/pagination`
 
 ---
 
-# Final Folder Structure (Frontend)
+# Clean version you can paste into your repo
 
-```
-shifttrack-frontend
-│
-├── components
-├── pages
-├── api
-├── hooks
-└── utils
-```
+```markdown
+# ShiftTrack Roadmap
 
----
+## Git Workflow
+Use one branch per feature, not one branch per phase.
 
-# Realistic Timeline
-
-If you work consistently:
-
-```
-Phase 1 backend     → 1 week
-Phase 2 frontend    → 1 week
-Phase 3 improvements→ 1 week
-Phase 4 analytics   → 3–4 days
-Phase 5 docker      → 2 days
-```
-
-Total:
-
-**~3 weeks for a polished project.**
-
-That’s a **very solid portfolio project**.
+Pattern:
+- feature/<task-name>
 
 ---
-
-If you want, I can also give you something extremely useful for the new project:
-
-**A full project README + architecture diagram that makes this look like a professional GitHub project.**
-
-yes
-
-Good move. If you’re starting fresh, the first thing you should create is a **strong README + architecture overview**. This does two things:
-
-1. Keeps *you* disciplined about the structure.
-2. Makes the project look **serious and professional** on GitHub.
-
-Below is a **complete README template** you can literally paste into your repo and adjust as you build.
-
----
-
-# ShiftTrack
-
-A personal shift tracking application that records daily work entries for multiple companies and automatically calculates pay based on weekday, Saturday, and Sunday rates.
-
-The application provides an easy way to track hours worked, calculate income, and view summaries over custom date ranges.
-
----
-
-# Project Goals
-
-The goal of this project is to build a **real-world full-stack application** while learning:
-
-- backend architecture with Spring Boot
-- REST API design
-- frontend development with React
-- database modelling
-- testing and error handling
-- Docker and deployment
-
-The project is built incrementally through structured phases.
-
----
-
-# Features
-
-### Core Features
-
-- Create and manage companies
-- Define weekday, Saturday, and Sunday pay rates
-- Record work shifts
-- Automatic pay calculation
-- Filter work entries by date
-- View total hours and earnings
-
-### Planned Improvements
-
-- Dashboard analytics
-- Charts for weekly/monthly earnings
-- CSV export
-- Mobile-friendly UI
-- Dockerized deployment
-
----
-
-# Tech Stack
-
-## Backend
-
-- Java
-- Spring Boot
-- Spring Data JPA
-- PostgreSQL
-- Bean Validation
-- JUnit
-
-## Frontend
-
-- React
-- Vite
-- TailwindCSS
-- Axios
-- React Router
-
-## DevOps (planned)
-
-- Docker
-- Docker Compose
-
----
-
-# System Architecture
-
-```
-React Frontend
-      |
-      | REST API
-      |
-Spring Boot Backend
-      |
-      | JPA
-      |
-PostgreSQL Database
-```
-
----
-
-# Application Architecture
-
-The backend follows a layered architecture:
-
-```
-Controller
-    |
-Service
-    |
-Repository
-    |
-Database
-```
-
-### Controller
-
-Handles HTTP requests and responses.
-
-Example:
-
-```
-POST /api/work-entries
-GET  /api/companies
-```
-
----
-
-### Service
-
-Contains business logic such as:
-
-- calculating pay
-- validating data
-- applying business rules
-
----
-
-### Repository
-
-Responsible for database access using Spring Data JPA.
-
----
-
-### DTO Layer
-
-DTOs separate API models from database entities.
-
-Example:
-
-```
-CompanyRequest
-CompanyResponse
-WorkEntryRequest
-WorkEntryResponse
-SummaryResponse
-```
-
----
-
-# Database Design
-
-## Company
-
-```
-Company
--------
-id
-name
-weekday_rate
-saturday_rate
-sunday_rate
-created_at
-```
-
----
-
-## WorkEntry
-
-```
-WorkEntry
----------
-id
-work_date
-start_time
-end_time
-break_hours
-total_hours
-calculated_pay
-notes
-company_id
-```
-
-Relationship:
-
-```
-Company 1 ---- * WorkEntry
-```
-
----
-
-# API Endpoints
-
-## Companies
-
-Create company
-
-```
-POST /api/companies
-```
-
-Get all companies
-
-```
-GET /api/companies
-```
-
-Get company by id
-
-```
-GET /api/companies/{id}
-```
-
-Update company
-
-```
-PUT /api/companies/{id}
-```
-
-Delete company
-
-```
-DELETE /api/companies/{id}
-```
-
----
-
-## Work Entries
-
-Create entry
-
-```
-POST /api/work-entries
-```
-
-Get all entries
-
-```
-GET /api/work-entries
-```
-
-Get entry by id
-
-```
-GET /api/work-entries/{id}
-```
-
-Update entry
-
-```
-PUT /api/work-entries/{id}
-```
-
-Delete entry
-
-```
-DELETE /api/work-entries/{id}
-```
-
-Filter entries
-
-```
-GET /api/work-entries/filter?from=YYYY-MM-DD&to=YYYY-MM-DD
-```
-
----
-
-## Reports
-
-Get summary
-
-```
-GET /api/reports/summary?from=YYYY-MM-DD&to=YYYY-MM-DD
-```
-
-Response example:
-
-```
-{
-  totalHours: 45.5,
-  totalPay: 1520.50,
-  totalEntries: 6
-}
-```
-
----
-
-# Project Phases
 
 ## Phase 1 — Backend Foundation
-
-- Spring Boot setup
-- Company entity
-- WorkEntry entity
-- Pay calculation logic
-- Date filtering
-- Error handling
-- CRUD operations
-
-Estimated time: **1 week**
+- Day 1 Project Setup — Completed
+- Day 2 Company Module — Completed
+- Day 3 WorkEntry Module — Completed
+- Day 4 Hours and Pay Calculation — Completed
+- Day 5 Filtering and Summary — Completed
+- Day 6 Exception Handling — Completed
+- Day 7 Backend Testing and Polish — Completed
 
 ---
 
 ## Phase 2 — Frontend Core
-
-- React setup
-- Navigation
-- Companies page
-- Work entry form
-- Work entries table
-- Dashboard page
-
-Estimated time: **1 week**
+- FE Day 1 Frontend Setup — Completed
+- FE Day 2 Companies Page — Completed
+- FE Day 3 Work Entries Page — Completed
+- FE Day 4 Dashboard — Completed
+- FE Day 5 UI Improvements — Completed
 
 ---
 
 ## Phase 3 — Product Improvements
-
-- Entry editing
-- Entry deletion
-- Advanced filtering
-- Sorting
-- Pagination
-
-Estimated time: **1 week**
+- Day 1 Better Filtering — Next
+- Day 2 Editing Entries
+- Day 3 Deleting Entries
+- Day 4 Sorting
+- Day 5 Pagination
 
 ---
 
 ## Phase 4 — Analytics
-
-- Weekly income charts
-- Monthly summaries
-- Company comparison
+- Weekly income chart
+- Hours worked chart
+- Income per company chart
 
 ---
 
 ## Phase 5 — DevOps
-
-- Docker
+- Backend Dockerfile
+- Frontend Dockerfile
 - Docker Compose
 - Deployment
 
 ---
 
-# Project Structure
-
-## Backend
-
-```
-shifttrack-backend
-│
-├── controller
-├── service
-├── repository
-├── entity
-├── dto
-├── exception
-└── config
+## Phase 6 — Advanced Features
+- Mobile optimization
+- CSV/PDF export
+- Automation integrations
 ```
 
----
-
-## Frontend
-
-```
-shifttrack-frontend
-│
-├── components
-├── pages
-├── api
-├── hooks
-└── utils
-```
-
----
-
-# Example Workflow
-
-1. Create companies and define pay rates.
-2. Record work entries for each shift.
-3. System calculates hours and pay automatically.
-4. Use date filters to view earnings.
-5. View summaries of total hours and pay.
-
----
-
-# Future Improvements
-
-Possible future features:
-
-- mobile app
-- receipt export
-- automatic timesheet generation
-- integrations with calendar tools
-
----
-
-# License
-
-This project is for learning and personal productivity purposes.
+If you want, I can turn this into a **proper `ROADMAP.md` file format** with checkboxes and branch names beside each task.
