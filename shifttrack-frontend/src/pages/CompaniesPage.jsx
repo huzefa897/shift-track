@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
-import api from "@/api/axios";
 import CompanyForm from "@/components/CompanyForm";
 import CompanyList from "@/components/CompanyList";
 import AppShell from "@/components/ui/AppShell";
 import PageHeader from "@/components/ui/PageHeader";
-import { getAllCompanies, addCompany } from "../api/companyService";
+import {
+  getAllCompanies,
+  addCompany,
+  updateCompany,
+  deleteCompany,
+} from "../api/companyService";
 
 function CompaniesPage() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [editingCompany, setEditingCompany] = useState(null);
+  
   async function fetchCompanies() {
     try {
       setLoading(true);
@@ -37,6 +42,53 @@ function CompaniesPage() {
     }
   }
 
+  async function handleUpdateCompany(companyId, updatedCompany) {
+    try {
+      const response = await updateCompany(companyId, updatedCompany);
+
+      setCompanies((prev) =>
+        prev.map((company) =>
+          company.id === companyId ? response : company
+        )
+      );
+
+      setEditingCompany(null);
+      setError("");
+    } catch (err) {
+      console.error("Failed to update company:", err);
+      setError("Failed to update company.");
+      throw err;
+    }
+  }
+
+  function handleEditCompany(company) {
+    setEditingCompany(company);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function handleDeleteCompany(companyId) {
+  try {
+    await deleteCompany(companyId);
+
+    setCompanies((prev) =>
+      prev.filter((company) => company.id !== companyId)
+    );
+
+    if (editingCompany && editingCompany.id === companyId) {
+      setEditingCompany(null);
+    }
+
+    setError("");
+  } catch (err) {
+    console.error("Failed to delete company:", err);
+    setError("Failed to delete company.");
+  }
+}
+
+  function handleCancelEdit() {
+    setEditingCompany(null);
+  }
+
   useEffect(() => {
     fetchCompanies();
   }, []);
@@ -55,14 +107,23 @@ function CompaniesPage() {
       )}
 
       <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
-        <CompanyForm onAddCompany={handleAddCompany} />
+        <CompanyForm
+          onAddCompany={handleAddCompany}
+          onUpdateCompany={handleUpdateCompany}
+          editingCompany={editingCompany}
+          onCancelEdit={handleCancelEdit}
+        />
 
         {loading ? (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-sm text-zinc-400 shadow-sm">
             Loading companies...
           </div>
         ) : (
-          <CompanyList companies={companies} />
+          <CompanyList
+            companies={companies}
+            onEdit={handleEditCompany}
+            onDelete={handleDeleteCompany}
+          />
         )}
       </div>
     </AppShell>

@@ -19,3 +19,23 @@ export async function addCompany(newCompany) {
       throw err;
     }
   }
+
+  export async function updateCompany(id, companyData) {
+    try {
+      const response = await api.put(`/companies/${id}`, companyData);
+      return response.data;
+    } catch (err) {
+      console.error("Failed to update company:", err);
+      throw err;
+    }
+  }
+
+  export async function deleteCompany(id) {
+    try {
+      const response = await api.delete(`/companies/${id}`);
+      return response.data;
+    } catch (err) {
+      console.error("Failed to delete company:", err);
+      throw err;
+    }
+  }

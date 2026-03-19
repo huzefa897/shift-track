@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,15 +10,34 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-function CompanyForm({ onAddCompany }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    weekdayRate: "",
-    saturdayRate: "",
-    sundayRate: "",
-  });
+const initialFormData = {
+  name: "",
+  weekdayRate: "",
+  saturdayRate: "",
+  sundayRate: "",
+};
 
+function CompanyForm({
+  onAddCompany,
+  onUpdateCompany,
+  editingCompany,
+  onCancelEdit,
+}) {
+  const [formData, setFormData] = useState(initialFormData);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (editingCompany) {
+      setFormData({
+        name: editingCompany.name || "",
+        weekdayRate: editingCompany.weekdayRate || "",
+        saturdayRate: editingCompany.saturdayRate || "",
+        sundayRate: editingCompany.sundayRate || "",
+      });
+    } else {
+      setFormData(initialFormData);
+    }
+  }, [editingCompany]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -42,14 +61,13 @@ function CompanyForm({ onAddCompany }) {
     setSubmitting(true);
 
     try {
-      await onAddCompany(payload);
+      if (editingCompany) {
+        await onUpdateCompany(editingCompany.id, payload);
+      } else {
+        await onAddCompany(payload);
+      }
 
-      setFormData({
-        name: "",
-        weekdayRate: "",
-        saturdayRate: "",
-        sundayRate: "",
-      });
+      setFormData(initialFormData);
     } finally {
       setSubmitting(false);
     }
@@ -58,9 +76,13 @@ function CompanyForm({ onAddCompany }) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl text-zinc-100">Add Company</CardTitle>
+        <CardTitle className="text-xl text-zinc-100">
+          {editingCompany ? "Edit Company" : "Add Company"}
+        </CardTitle>
         <CardDescription className="text-zinc-400">
-          Save a company and define weekday, Saturday, and Sunday rates.
+          {editingCompany
+            ? "Update the company details and pay rates."
+            : "Save a company and define weekday, Saturday, and Sunday rates."}
         </CardDescription>
       </CardHeader>
 
@@ -134,13 +156,30 @@ function CompanyForm({ onAddCompany }) {
             </div>
           </div>
 
-          <div className="flex justify-stretch md:justify-end">
+          <div className="flex flex-col gap-3 md:flex-row md:justify-end">
+            {editingCompany && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancelEdit}
+                className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+              >
+                Cancel
+              </Button>
+            )}
+
             <Button
               type="submit"
               disabled={submitting}
               className="w-full bg-white text-black hover:bg-zinc-200 md:w-auto"
             >
-              {submitting ? "Saving..." : "Save Company"}
+              {submitting
+                ? editingCompany
+                  ? "Updating..."
+                  : "Saving..."
+                : editingCompany
+                ? "Update Company"
+                : "Save Company"}
             </Button>
           </div>
         </form>
