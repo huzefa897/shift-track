@@ -15,6 +15,7 @@ public class CompanyResponse {
     private BigDecimal weekdayRate;
     private BigDecimal saturdayRate;
     private BigDecimal sundayRate;
+    private BigDecimal taxRate;
     private LocalDateTime createdAt;
 
 }

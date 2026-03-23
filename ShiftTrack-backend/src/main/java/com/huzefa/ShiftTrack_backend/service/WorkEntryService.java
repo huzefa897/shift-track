@@ -48,11 +48,16 @@ public class WorkEntryService {
                 request.getBreakHours()
         );
 
-        BigDecimal calculatedPay = payCalculationService.calculatedPay(
+        BigDecimal grossPay = payCalculationService.calculateGrossPay(
                 request.getWorkDate(),
                 totalHours,
                 company
         );
+        BigDecimal netPay = payCalculationService.calculateNetPay(
+                grossPay,
+                company.getTaxRate()
+        );
+        BigDecimal taxAmount = payCalculationService.calculateTaxAmount(grossPay,netPay);
 
         WorkEntry workEntry = WorkEntry.builder()
                 .workDate(request.getWorkDate())
@@ -60,7 +65,9 @@ public class WorkEntryService {
                 .endTime(request.getEndTime())
                 .breakHours(request.getBreakHours())
                 .totalHours(totalHours)
-                .calculatedPay(calculatedPay)
+                .calculatedPay(grossPay)
+                .netPay(netPay)
+                .taxAmount(taxAmount)
                 .notes(request.getNotes())
                 .company(company)
                 .build();
@@ -100,7 +107,7 @@ public class WorkEntryService {
                 request.getBreakHours()
         );
 
-        BigDecimal calculatedPay = payCalculationService.calculatedPay(
+        BigDecimal calculatedPay = payCalculationService.calculateGrossPay(
                 request.getWorkDate(),
                 totalHours,
                 company
@@ -213,6 +220,8 @@ public class WorkEntryService {
                 .breakHours(workEntry.getBreakHours())
                 .totalHours(workEntry.getTotalHours())
                 .calculatedPay(workEntry.getCalculatedPay())
+                .taxAmount(workEntry.getTaxAmount())
+                .netPay(workEntry.getNetPay())
                 .notes(workEntry.getNotes())
                 .companyId(workEntry.getCompany().getId())
                 .companyName(workEntry.getCompany().getName())

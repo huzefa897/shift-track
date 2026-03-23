@@ -16,7 +16,9 @@ public class WorkEntryResponse {
     private LocalTime endTime;
     private BigDecimal breakHours;
     private BigDecimal totalHours;
-    private BigDecimal calculatedPay;
+    private BigDecimal calculatedPay;//grossPay
+    private BigDecimal taxAmount;
+    private BigDecimal netPay;
     private String notes;
     private Long companyId;
     private String companyName;
