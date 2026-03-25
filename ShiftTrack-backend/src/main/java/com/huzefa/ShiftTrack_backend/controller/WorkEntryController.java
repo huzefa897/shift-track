@@ -50,4 +50,12 @@ public class WorkEntryController {
         workEntryService.deleteWorkEntry(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    //TEMP CONTROLLER FOR UPDATED FIELD!
+    @PostMapping("/backfill-pay-fields")
+    public ResponseEntity<String> backfillPayFields() {
+        workEntryService.backfillPayFields();
+        return ResponseEntity.ok("Pay fields backfilled successfully.");
+    }
 }

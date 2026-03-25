@@ -38,6 +38,13 @@ public class WorkEntry {
 
     @Column(nullable = false)
     public String notes;
+    @Column(name = "tax_amount", precision = 10, scale = 2)
+    private BigDecimal taxAmount;
+
+    @Column(name = "net_pay", precision = 10, scale = 2)
+    private BigDecimal netPay;
+
+
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;

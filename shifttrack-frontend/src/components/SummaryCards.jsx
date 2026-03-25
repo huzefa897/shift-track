@@ -18,6 +18,7 @@ function formatHours(hours) {
 }
 
 function SummaryCards({ summary }) {
+
   const cards = [
     {
       title: "Total Hours",
@@ -25,9 +26,19 @@ function SummaryCards({ summary }) {
       description: "Hours worked in selected range",
     },
     {
-      title: "Total Pay",
+      title: "Total Gross Pay",
       value: formatCurrency(summary.totalPay),
       description: "Calculated income in selected range",
+    },
+    {
+      title: "Total Tax",
+      value: summary.totalTax ?? 0,
+      description: "Recorded shifts in selected range",
+    },
+    {
+      title: "Total Net Pay",
+      value: formatCurrency(summary.totalNetPay ?? 0),
+      description: "Recorded shifts in selected range",
     },
     {
       title: "Total Entries",

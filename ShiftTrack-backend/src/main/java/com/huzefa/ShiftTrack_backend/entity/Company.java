@@ -35,6 +35,9 @@ public class Company {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "tax_rate", precision = 5, scale = 2)
+    private BigDecimal taxRate;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

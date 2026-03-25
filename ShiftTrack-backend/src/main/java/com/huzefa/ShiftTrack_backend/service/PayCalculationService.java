@@ -18,6 +18,26 @@ public class PayCalculationService {
         BigDecimal rate = getRateForDay(company,workDate);
         return totalHours.multiply(rate).setScale(2, RoundingMode.HALF_UP);
     }
+
+    public BigDecimal calculateGrossPay(LocalDate workDate,
+                                        BigDecimal totalHours,
+                                        Company company) {
+        BigDecimal rate = getRateForDay(company, workDate);
+        return totalHours.multiply(rate).setScale(2, RoundingMode.HALF_UP);
+    }
+    public BigDecimal calculateNetPay(BigDecimal grossPay, BigDecimal taxRate) {
+        BigDecimal safeTaxRate = taxRate != null ? taxRate : BigDecimal.ZERO;
+
+        BigDecimal keepPercentage = BigDecimal.valueOf(100).subtract(safeTaxRate);
+
+        return grossPay
+                .multiply(keepPercentage)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    }
+    public BigDecimal calculateTaxAmount(BigDecimal grossPay, BigDecimal netPay) {
+        return grossPay.subtract(netPay).setScale(2, RoundingMode.HALF_UP);
+    }
+
     private BigDecimal getRateForDay(Company company, LocalDate workDate) {
         DayOfWeek dayOfWeek = workDate.getDayOfWeek();
 

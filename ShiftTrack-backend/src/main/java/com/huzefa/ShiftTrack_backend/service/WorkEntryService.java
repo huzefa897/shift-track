@@ -48,11 +48,16 @@ public class WorkEntryService {
                 request.getBreakHours()
         );
 
-        BigDecimal calculatedPay = payCalculationService.calculatedPay(
+        BigDecimal grossPay = payCalculationService.calculateGrossPay(
                 request.getWorkDate(),
                 totalHours,
                 company
         );
+        BigDecimal netPay = payCalculationService.calculateNetPay(
+                grossPay,
+                company.getTaxRate()
+        );
+        BigDecimal taxAmount = payCalculationService.calculateTaxAmount(grossPay,netPay);
 
         WorkEntry workEntry = WorkEntry.builder()
                 .workDate(request.getWorkDate())
@@ -60,7 +65,9 @@ public class WorkEntryService {
                 .endTime(request.getEndTime())
                 .breakHours(request.getBreakHours())
                 .totalHours(totalHours)
-                .calculatedPay(calculatedPay)
+                .calculatedPay(grossPay)
+                .netPay(netPay)
+                .taxAmount(taxAmount)
                 .notes(request.getNotes())
                 .company(company)
                 .build();
@@ -100,12 +107,23 @@ public class WorkEntryService {
                 request.getBreakHours()
         );
 
-        BigDecimal calculatedPay = payCalculationService.calculatedPay(
+        BigDecimal calculatedPay = payCalculationService.calculateGrossPay(
                 request.getWorkDate(),
                 totalHours,
                 company
         );
+        BigDecimal netPay = payCalculationService.calculateNetPay(
+                calculatedPay,
+                company.getTaxRate()
+        );
 
+        BigDecimal taxAmount = payCalculationService.calculateTaxAmount(
+                calculatedPay,
+                netPay
+        );
+
+        existingWorkEntry.setNetPay(netPay);
+        existingWorkEntry.setTaxAmount(taxAmount);
         existingWorkEntry.setWorkDate(request.getWorkDate());
         existingWorkEntry.setStartTime(request.getStartTime());
         existingWorkEntry.setEndTime(request.getEndTime());
@@ -162,11 +180,24 @@ public class WorkEntryService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
 
+        BigDecimal totalNetPay = entries.stream()
+                .map(e -> e.getNetPay() != null ? e.getNetPay() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal totalTax = entries.stream()
+                .map(e -> e.getTaxAmount() != null ? e.getTaxAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+
         long totalEntries = entries.size();
 
         return SummaryResponse.builder()
                 .totalHours(totalHours)
                 .totalPay(totalPay)
+                .totalTax(totalTax)
+                .totalNetPay(totalNetPay)
                 .totalEntries(totalEntries)
                 .build();
     }
@@ -213,9 +244,42 @@ public class WorkEntryService {
                 .breakHours(workEntry.getBreakHours())
                 .totalHours(workEntry.getTotalHours())
                 .calculatedPay(workEntry.getCalculatedPay())
+                .taxAmount(workEntry.getTaxAmount())
+                .netPay(workEntry.getNetPay())
                 .notes(workEntry.getNotes())
                 .companyId(workEntry.getCompany().getId())
                 .companyName(workEntry.getCompany().getName())
                 .build();
+    }
+
+//TEMP SERVICE
+    public void backfillPayFields() {
+        List<WorkEntry> entries = workEntryRepository.findAll();
+
+        for (WorkEntry entry : entries) {
+            Company company = entry.getCompany();
+
+            BigDecimal grossPay = payCalculationService.calculateGrossPay(
+                    entry.getWorkDate(),
+                    entry.getTotalHours(),
+                    company
+            );
+
+            BigDecimal netPay = payCalculationService.calculateNetPay(
+                    grossPay,
+                    company.getTaxRate()
+            );
+
+            BigDecimal taxAmount = payCalculationService.calculateTaxAmount(
+                    grossPay,
+                    netPay
+            );
+
+            entry.setCalculatedPay(grossPay);
+            entry.setNetPay(netPay);
+            entry.setTaxAmount(taxAmount);
+        }
+
+        workEntryRepository.saveAll(entries);
     }
 }

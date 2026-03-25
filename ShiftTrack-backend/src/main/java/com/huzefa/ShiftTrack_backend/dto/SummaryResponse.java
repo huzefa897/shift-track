@@ -12,5 +12,7 @@ import java.math.BigDecimal;
 public class SummaryResponse {
     private BigDecimal totalHours;
     private BigDecimal totalPay;
+    private BigDecimal totalTax;
+    private BigDecimal totalNetPay;
     private long totalEntries;
 }
