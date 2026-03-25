@@ -28,6 +28,7 @@ function formatHours(hours) {
 }
 
 function EntriesTable({ entries }) {
+  console.log(entries)
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
       <CardHeader className="pb-4">
@@ -52,7 +53,9 @@ function EntriesTable({ entries }) {
                   <TableHead className="text-zinc-400">Start</TableHead>
                   <TableHead className="text-zinc-400">End</TableHead>
                   <TableHead className="text-right text-zinc-400">Hours</TableHead>
-                  <TableHead className="text-right text-zinc-400">Pay</TableHead>
+                  <TableHead className="text-right text-zinc-400">Gross Pay</TableHead>
+                  <TableHead className="text-right text-zinc-400">Net Pay</TableHead>
+                  <TableHead className="text-right text-zinc-400">Tax Amount</TableHead>
                   <TableHead className="text-zinc-400">Notes</TableHead>
                 </TableRow>
               </TableHeader>
@@ -61,9 +64,24 @@ function EntriesTable({ entries }) {
                 {entries.map((entry) => (
                   <TableRow
                     key={entry.id}
-                    className="border-zinc-800 hover:bg-zinc-900/40"
+                    className="borderā-zinc-800 hover:bg-zinc-900/40"
                   >
-                    <TableCell>{entry.workDate || "-"}</TableCell>
+                 <TableCell className="px-4">
+  <div className="flex flex-col">
+    <span className="font-medium text-zinc-100">
+      {new Date(entry.workDate).toLocaleDateString("en-AU", {
+        weekday: "short",
+      })}
+    </span>
+    <span className="text-xs text-zinc-500">
+      {new Date(entry.workDate).toLocaleDateString("en-AU", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })}
+    </span>
+  </div>
+</TableCell>
                     <TableCell>
                       {entry.companyName ?? entry.company?.name ?? entry.companyId ?? "-"}
                     </TableCell>
@@ -74,6 +92,12 @@ function EntriesTable({ entries }) {
                     </TableCell>
                     <TableCell className="text-right">
                       {formatCurrency(entry.calculatedPay)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatCurrency(entry.netPay)}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {formatCurrency(entry.taxAmount)}
                     </TableCell>
                     <TableCell>
                       <span

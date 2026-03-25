@@ -56,7 +56,8 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
                   <TableHead className="text-zinc-400">End</TableHead>
                   <TableHead className="text-right text-zinc-400">Break</TableHead>
                   <TableHead className="text-right text-zinc-400">Hours</TableHead>
-                  <TableHead className="text-right text-zinc-400">Pay</TableHead>
+                  <TableHead className="text-right text-zinc-400">Gross Pay</TableHead>
+                  
                   <TableHead className="text-zinc-400">Notes</TableHead>
                   <TableHead className="w-[180px] text-right text-zinc-400">
                     Actions
