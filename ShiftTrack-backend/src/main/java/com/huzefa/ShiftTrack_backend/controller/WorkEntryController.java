@@ -4,6 +4,8 @@ import com.huzefa.ShiftTrack_backend.dto.WorkEntryRequest;
 import com.huzefa.ShiftTrack_backend.dto.WorkEntryResponse;
 import com.huzefa.ShiftTrack_backend.service.WorkEntryService;
 import jakarta.validation.Valid;
+import org.aspectj.lang.annotation.RequiredTypes;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -50,12 +52,22 @@ public class WorkEntryController {
         workEntryService.deleteWorkEntry(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/paginated")
+    public Page<WorkEntryResponse> getPaginatedEntries(
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to,
+            @RequestParam(required = false) Long companyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
 
 
-    //TEMP CONTROLLER FOR UPDATED FIELD!
-    @PostMapping("/backfill-pay-fields")
-    public ResponseEntity<String> backfillPayFields() {
-        workEntryService.backfillPayFields();
-        return ResponseEntity.ok("Pay fields backfilled successfully.");
+    ){
+        return workEntryService.getPaginatedWorkEntriesBetweenDates(
+                from,
+                to,
+                companyId,
+                page,
+                size
+                );
     }
 }
