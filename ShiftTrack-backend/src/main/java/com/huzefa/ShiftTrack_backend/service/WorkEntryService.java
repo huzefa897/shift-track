@@ -10,6 +10,10 @@ import com.huzefa.ShiftTrack_backend.exception.ResourceNotFoundException;
 import com.huzefa.ShiftTrack_backend.repository.CompanyRepository;
 import com.huzefa.ShiftTrack_backend.repository.WorkEntryRepository;
 import com.huzefa.ShiftTrack_backend.service.PayCalculationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -251,8 +255,29 @@ public class WorkEntryService {
                 .companyName(workEntry.getCompany().getName())
                 .build();
     }
+    public Page<WorkEntryResponse> getPaginatedWorkEntriesBetweenDates(LocalDate from, LocalDate to, Long companyId, int page, int size){
+        validateDateRange(from,to);
+        Pageable pageable = PageRequest.of(
+                page,size, Sort.by(Sort.Direction.DESC,"workDate")
+        );
+        Page<WorkEntry> entriesPage;
+        if(companyId!=null){
+            entriesPage = workEntryRepository.findByWorkDateBetweenAndCompanyId(
+                    from,to,companyId,pageable
+            );
+        }
+            else{
+                entriesPage=workEntryRepository.findByWorkDateBetween(
+                        from,
+                        to,
+                        pageable
+                );
+        }
+        return entriesPage.map(this::mapToResponse);
+    }
 
-//TEMP SERVICE
+
+//------------------------------------TEMP SERVICE----------------------------------
     public void backfillPayFields() {
         List<WorkEntry> entries = workEntryRepository.findAll();
 
@@ -282,4 +307,5 @@ public class WorkEntryService {
 
         workEntryRepository.saveAll(entries);
     }
+    //------------------------------------TEMP SERVICE----------------------------------
 }
