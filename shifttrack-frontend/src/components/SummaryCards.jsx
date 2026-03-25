@@ -26,25 +26,28 @@ function SummaryCards({ summary }) {
       description: "Hours worked in selected range",
     },
     {
-      title: "Total Gross Pay",
-      value: formatCurrency(summary.totalPay),
-      description: "Calculated income in selected range",
-    },
-    {
-      title: "Total Tax",
-      value: summary.totalTax ?? 0,
-      description: "Recorded shifts in selected range",
-    },
-    {
-      title: "Total Net Pay",
-      value: formatCurrency(summary.totalNetPay ?? 0),
-      description: "Recorded shifts in selected range",
-    },
-    {
       title: "Total Entries",
       value: summary.totalEntries ?? 0,
       description: "Recorded shifts in selected range",
     },
+      
+    {
+      title: "Total Tax",
+      value: summary.totalTax ?? 0,
+      description: "Total tax in selected range",
+    },
+    {
+      title: "Total Gross Pay",
+      value: formatCurrency(summary.totalPay),
+      description: "Gross income in selected range",
+    },
+     
+    {
+      title: "Total Net Pay",
+      value: formatCurrency(summary.totalNetPay ?? 0),
+      description: "Net Income in selected range",
+    },
+   
   ];
 
   return (
