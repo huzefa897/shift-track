@@ -26,6 +26,8 @@ function DashboardPage() {
   const [summary, setSummary] = useState({
     totalHours: 0,
     totalPay: 0,
+    totalTax: 0,
+    totalNetPay: 0,
     totalEntries: 0,
   });
 

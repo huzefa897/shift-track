@@ -64,6 +64,9 @@ function CompanyList({ companies, onEdit, onDelete }) {
                     Sunday
                   </TableHead>
                   <TableHead className="text-right text-zinc-400">
+                    Tax Rate
+                  </TableHead>
+                  <TableHead className="text-right text-zinc-400">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -86,6 +89,9 @@ function CompanyList({ companies, onEdit, onDelete }) {
                     </TableCell>
                     <TableCell className="text-right">
                       {formatCurrency(company.sundayRate)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {company.taxRate}%
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

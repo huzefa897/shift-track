@@ -15,6 +15,7 @@ const initialFormData = {
   weekdayRate: "",
   saturdayRate: "",
   sundayRate: "",
+  taxRate: "",
 };
 
 function CompanyForm({
@@ -56,6 +57,7 @@ function CompanyForm({
       weekdayRate: Number(formData.weekdayRate),
       saturdayRate: Number(formData.saturdayRate),
       sundayRate: Number(formData.sundayRate),
+      taxRate: Number(formData.taxRate),
     };
 
     setSubmitting(true);
@@ -155,6 +157,19 @@ function CompanyForm({
               />
             </div>
           </div>
+          <div className="space-y-2">
+            <label className="text-sm text-zinc-300">Tax Rate (%)</label>
+            <input
+              type="number"
+              name="taxRate"
+              step="0.01"
+              min="0"
+              max="100"
+              value={formData.taxRate}
+              onChange={handleChange}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-600"
+            />
+          </div>
 
           <div className="flex flex-col gap-3 md:flex-row md:justify-end">
             {editingCompany && (
@@ -178,8 +193,8 @@ function CompanyForm({
                   ? "Updating..."
                   : "Saving..."
                 : editingCompany
-                ? "Update Company"
-                : "Save Company"}
+                  ? "Update Company"
+                  : "Save Company"}
             </Button>
           </div>
         </form>

@@ -14,6 +14,5 @@ public class SummaryResponse {
     private BigDecimal totalPay;
     private BigDecimal totalTax;
     private BigDecimal totalNetPay;
-
     private long totalEntries;
 }
