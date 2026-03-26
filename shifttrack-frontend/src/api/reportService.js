@@ -1,4 +1,4 @@
-import api from "../axios";
+import api from "./axios";
 
 export async function getSummary(filters) {
   const params = {
@@ -8,5 +8,17 @@ export async function getSummary(filters) {
   };
 
   const response = await api.get("/reports/summary", { params });
+  return response.data;
+}
+
+export async function fetchWeeklyIncome(filters) {
+  const response = await api.get("/reports/analytics/weekly-income", {
+    params: {
+      from: filters.from,
+      to: filters.to,
+      companyId: filters.companyId || undefined,
+    },
+  });
+
   return response.data;
 }

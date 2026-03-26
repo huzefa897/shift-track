@@ -26,3 +26,4 @@ export async function fetchSummary(filters) {
   const response = await api.get("/reports/summary", { params });
   return response.data;
 }
+

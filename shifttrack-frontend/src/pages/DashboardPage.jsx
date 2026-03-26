@@ -7,10 +7,12 @@ import {
 import DateFilter from "@/components/DateFilter";
 import SummaryCards from "@/components/SummaryCards";
 import EntriesTable from "@/components/EntriesTable";
+import WeeklyIncomeCharts from "@/components/WeeklyIncomeCharts";
+import { fetchWeeklyIncome } from "../api/reportService";
 
 function DashboardPage() {
   const today = new Date().toISOString().split("T")[0];
-
+  const [weeklyIncome, setWeeklyIncome] = useState([]); // TODO: Implement weekly income chart
   const [companies, setCompanies] = useState([]);
   const [filters, setFilters] = useState({
     from: today,
@@ -30,6 +32,7 @@ function DashboardPage() {
     totalNetPay: 0,
     totalEntries: 0,
   });
+
 
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,13 +87,15 @@ function DashboardPage() {
       setLoading(true);
       setError("");
 
-      const [entriesData, summaryData] = await Promise.all([
+      const [entriesData, summaryData,weeklyIncomeData] = await Promise.all([
         fetchFilteredWorkEntries(currentFilters),
         fetchSummary(currentFilters),
+        fetchWeeklyIncome(currentFilters)
       ]);
 
       setEntries(entriesData);
       setSummary(summaryData);
+      setWeeklyIncome(weeklyIncomeData.content);
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
       setError("Failed to load dashboard data.");
@@ -193,7 +198,9 @@ function DashboardPage() {
           ) : (
             <>
               <SummaryCards summary={summary} />
+              <WeeklyIncomeCharts weeklyIncome={weeklyIncome}/>
               <EntriesTable entries={sortedEntries} />
+              
             </>
           )}
         </div>
