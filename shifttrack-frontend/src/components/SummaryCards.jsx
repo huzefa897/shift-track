@@ -33,7 +33,7 @@ function SummaryCards({ summary }) {
       
     {
       title: "Total Tax",
-      value: summary.totalTax ?? 0,
+      value: formatCurrency(summary.totalTax ?? 0),
       description: "Total tax in selected range",
     },
     {

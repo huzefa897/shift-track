@@ -5,17 +5,19 @@ export async function fetchCompanies() {
   return response.data;
 }
 
-export async function fetchFilteredWorkEntries(filters) {
-  const params = {
-    from: filters.from,
-    to: filters.to,
-    ...(filters.companyId && { companyId: filters.companyId }),
-  };
+export async function fetchFilteredWorkEntries(filters, page = 0, size = 10) {
+  const response = await api.get("/work-entries/paginated", {
+    params: {
+      from: filters.from,
+      to: filters.to,
+      companyId: filters.companyId || undefined,
+      page,
+      size,
+    },
+  });
 
-  const response = await api.get("/work-entries/filter", { params });
   return response.data;
 }
-
 export async function fetchSummary(filters) {
   const params = {
     from: filters.from,
