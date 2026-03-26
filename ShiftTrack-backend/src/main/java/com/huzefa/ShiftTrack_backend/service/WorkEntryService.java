@@ -1,6 +1,7 @@
 package com.huzefa.ShiftTrack_backend.service;
 
 import com.huzefa.ShiftTrack_backend.dto.SummaryResponse;
+import com.huzefa.ShiftTrack_backend.dto.WeeklyIncomeResponse;
 import com.huzefa.ShiftTrack_backend.dto.WorkEntryRequest;
 import com.huzefa.ShiftTrack_backend.dto.WorkEntryResponse;
 import com.huzefa.ShiftTrack_backend.entity.Company;
@@ -10,6 +11,7 @@ import com.huzefa.ShiftTrack_backend.exception.ResourceNotFoundException;
 import com.huzefa.ShiftTrack_backend.repository.CompanyRepository;
 import com.huzefa.ShiftTrack_backend.repository.WorkEntryRepository;
 import com.huzefa.ShiftTrack_backend.service.PayCalculationService;
+import org.hibernate.jdbc.Work;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +20,14 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class WorkEntryService {
@@ -147,7 +153,7 @@ public class WorkEntryService {
 
         workEntryRepository.delete(workEntry);
     }
-
+//Summaries
     public List<WorkEntryResponse> getWorkEntriesBetweenDates(LocalDate from, LocalDate to,Long companyId) {
         validateDateRange(from, to);
         List<WorkEntry> entries;
@@ -255,6 +261,8 @@ public class WorkEntryService {
                 .companyName(workEntry.getCompany().getName())
                 .build();
     }
+
+    //Pagination
     public Page<WorkEntryResponse> getPaginatedWorkEntriesBetweenDates(LocalDate from, LocalDate to, Long companyId, int page, int size){
         validateDateRange(from,to);
         Pageable pageable = PageRequest.of(
@@ -276,7 +284,36 @@ public class WorkEntryService {
         return entriesPage.map(this::mapToResponse);
     }
 
+    //------------------------------------------Analytics------------------------------------------
+    public List<WeeklyIncomeResponse> getWeeklyIncomeBetweenDates(LocalDate from, LocalDate to, Long companyId){
+        validateDateRange(from,to);
+        List<WorkEntry> entries;
+        if(companyId!=null){
+            entries=workEntryRepository.findByWorkDateBetweenAndCompanyId(from,to,companyId);
+        }
+        else{
+            entries = workEntryRepository.findByWorkDateBetween(from,to);
+        }
+        Map<LocalDate, BigDecimal> weeklyTotals = new LinkedHashMap<>();
+        entries.stream()
+                .sorted(Comparator.comparing(WorkEntry::getWorkDate))
+                .forEach(entry->{
+                    LocalDate weekStart =entry.getWorkDate().with(DayOfWeek.MONDAY);
+                    weeklyTotals.put(
+                            weekStart,
+                            weeklyTotals.getOrDefault(weekStart,BigDecimal.ZERO)
+                                    .add(entry.getCalculatedPay())!=null?entry.getCalculatedPay():BigDecimal.ZERO);
 
+                });
+        return weeklyTotals.entrySet().stream()
+                .map(entry->WeeklyIncomeResponse.builder()
+                        .label(entry.getKey().toString())
+                        .totalPay(entry.getValue().setScale(2,RoundingMode.HALF_UP))
+                        .build()  )
+                .toList();
+
+
+    }
 //------------------------------------TEMP SERVICE----------------------------------
     public void backfillPayFields() {
         List<WorkEntry> entries = workEntryRepository.findAll();
