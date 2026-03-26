@@ -95,7 +95,7 @@ function DashboardPage() {
 
       setEntries(entriesData);
       setSummary(summaryData);
-      setWeeklyIncome(weeklyIncomeData.content);
+      setWeeklyIncome(weeklyIncomeData);
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
       setError("Failed to load dashboard data.");
