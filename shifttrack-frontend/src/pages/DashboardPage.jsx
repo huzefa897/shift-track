@@ -19,6 +19,14 @@ function DashboardPage() {
     to: today,
     companyId: "",
   });
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 10,
+    totalPages: 0,
+    totalElements: 0,
+    first: true,
+    last: false,
+  });
 
   const [sortConfig, setSortConfig] = useState({
     key: "workDate",
@@ -43,6 +51,11 @@ function DashboardPage() {
     setFilters((prev) => ({
       ...prev,
       [name]: value,
+    }));
+
+    setPagination((prev) => ({
+      ...prev,
+      page: 0,
     }));
   }
 
@@ -74,10 +87,17 @@ function DashboardPage() {
     };
 
     setFilters(updatedFilters);
-    fetchDashboardData(updatedFilters);
+    setPagination((prev) => ({
+      ...prev,
+      page: 0,
+    }));
+    fetchDashboardData(updatedFilters, 0);
   }
 
-  async function fetchDashboardData(currentFilters = filters) {
+  async function fetchDashboardData(
+    currentFilters = filters,
+    currentPage = pagination.page,
+  ) {
     if (!currentFilters.from || !currentFilters.to) {
       setError("Please select both from and to dates.");
       return;
@@ -87,13 +107,23 @@ function DashboardPage() {
       setLoading(true);
       setError("");
 
-      const [entriesData, summaryData,weeklyIncomeData] = await Promise.all([
-        fetchFilteredWorkEntries(currentFilters),
+      const [entriesPage, summaryData, weeklyIncomeData] = await Promise.all([
+        fetchFilteredWorkEntries(currentFilters, currentPage, pagination.size),
         fetchSummary(currentFilters),
         fetchWeeklyIncome(currentFilters)
       ]);
 
-      setEntries(entriesData);
+      setEntries(entriesPage.content);
+      setPagination((prev) => ({
+        ...prev,
+        page: entriesPage.number,
+        size: entriesPage.size,
+        totalPages: entriesPage.totalPages,
+        totalElements: entriesPage.totalElements,
+        first: entriesPage.first,
+        last: entriesPage.last,
+      }));
+      
       setSummary(summaryData);
       setWeeklyIncome(weeklyIncomeData);
     } catch (err) {
@@ -103,11 +133,17 @@ function DashboardPage() {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    loadCompanies();
-    fetchDashboardData(filters);
-  }, []);
+useEffect(() => {
+  loadCompanies();
+  fetchDashboardData(
+    {
+      from: today,
+      to: today,
+      companyId: "",
+    },
+    0
+  );
+}, []);
 
   const sortedEntries = [...entries].sort((a, b) => {
     let valueA = a[sortConfig.key];
@@ -140,7 +176,7 @@ function DashboardPage() {
           <DateFilter
             filters={filters}
             onChange={handleFilterChange}
-            onApply={() => fetchDashboardData(filters)}
+            onApply={() => fetchDashboardData(filters, 0)}
             onQuickFilter={handleQuickFilter}
           />
 
@@ -160,25 +196,33 @@ function DashboardPage() {
 
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setSortConfig({ key: "workDate", direction: "desc" })}
+              onClick={() =>
+                setSortConfig({ key: "workDate", direction: "desc" })
+              }
               className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
             >
               Latest Date
             </button>
             <button
-              onClick={() => setSortConfig({ key: "calculatedPay", direction: "desc" })}
+              onClick={() =>
+                setSortConfig({ key: "calculatedPay", direction: "desc" })
+              }
               className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
             >
               Highest Pay
             </button>
             <button
-              onClick={() => setSortConfig({ key: "totalHours", direction: "desc" })}
+              onClick={() =>
+                setSortConfig({ key: "totalHours", direction: "desc" })
+              }
               className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
             >
               Highest Hours
             </button>
             <button
-              onClick={() => setSortConfig({ key: "company", direction: "asc" })}
+              onClick={() =>
+                setSortConfig({ key: "company", direction: "asc" })
+              }
               className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 hover:bg-zinc-800"
             >
               Company A-Z
@@ -200,7 +244,44 @@ function DashboardPage() {
               <SummaryCards summary={summary} />
               <WeeklyIncomeCharts weeklyIncome={weeklyIncome}/>
               <EntriesTable entries={sortedEntries} />
-              
+              <div className="mt-4 flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-300">
+                <div>
+                  Page{" "}
+                  <span className="font-medium text-zinc-100">
+                    {pagination.page + 1}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-zinc-100">
+                    {Math.max(pagination.totalPages, 1)}
+                  </span>
+                  {" · "}
+                  <span className="text-zinc-400">
+                    {pagination.totalElements} total entries
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      fetchDashboardData(filters, pagination.page - 1)
+                    }
+                    disabled={pagination.first || loading}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-zinc-100 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      fetchDashboardData(filters, pagination.page + 1)
+                    }
+                    disabled={pagination.last || loading}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-zinc-100 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </>
           )}
         </div>
