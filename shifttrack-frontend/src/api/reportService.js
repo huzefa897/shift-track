@@ -19,6 +19,6 @@ export async function fetchWeeklyIncome(filters) {
       companyId: filters.companyId || undefined,
     },
   });
-
+  console.log("Weekly income response:", response);
   return response.data;
 }

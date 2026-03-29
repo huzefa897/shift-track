@@ -21,12 +21,39 @@ function WorkEntriesPage() {
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 10,
+    totalPages: 0,
+    totalElements: 0,
+    first: true,
+    last: false,
+  });
 
-  async function fetchEntries() {
+  const [sortDirection, setSortDirection] = useState("desc");
+
+  async function fetchEntries(page = 0, direction = sortDirection) {
     try {
       setLoading(true);
-      const response = await api.get("/work-entries");
-      setEntries(response.data);
+      const response = await api.get("/work-entries/paginated", {
+        params: {
+          from: "2000-01-01",
+          to: new Date().toISOString().split("T")[0],
+          page,
+          size: pagination.size,
+          sortDirection: direction,
+        },
+      });
+      const data = response.data;
+      setEntries(data.content);
+      setPagination((prev) => ({
+        ...prev,
+        page: data.number,
+        totalPages: data.totalPages,
+        totalElements: data.totalElements,
+        first: data.first,
+        last: data.last,
+      }));
       setError("");
     } catch (err) {
       console.error("Failed to fetch work entries:", err);
@@ -36,10 +63,15 @@ function WorkEntriesPage() {
     }
   }
 
+  function handleSortChange(newDirection) {
+    setSortDirection(newDirection);
+    fetchEntries(0, newDirection);
+  }
+
   async function handleAddEntry(newEntry) {
     try {
-      const response = await api.post("/work-entries", newEntry);
-      setEntries((prev) => [response.data, ...prev]);
+      await api.post("/work-entries", newEntry);
+      fetchEntries(0); // refresh first page
       setError("");
     } catch (err) {
       console.error("Failed to add work entry:", err);
@@ -50,15 +82,9 @@ function WorkEntriesPage() {
 
   async function handleUpdateEntry(updatedEntry) {
     try {
-      const response = await api.put(`/work-entries/${editingEntry.id}`, updatedEntry);
-
-      setEntries((prev) =>
-        prev.map((entry) =>
-          entry.id === editingEntry.id ? response.data : entry
-        )
-      );
-
+      await api.put(`/work-entries/${editingEntry.id}`, updatedEntry);
       setEditingEntry(null);
+      fetchEntries(pagination.page); // refresh current page
       setError("");
     } catch (err) {
       console.error("Failed to update work entry:", err);
@@ -68,17 +94,12 @@ function WorkEntriesPage() {
   }
 
   function handleEditEntry(entry) {
-  setEditingEntry(entry);
-  setError("");
-
-  // scroll to form
-  setTimeout(() => {
-    formRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, 0);
-}
+    setEditingEntry(entry);
+    setError("");
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  }
 
   function handleCancelEdit() {
     setEditingEntry(null);
@@ -91,22 +112,18 @@ function WorkEntriesPage() {
 
   async function handleConfirmDelete() {
     if (!entryToDelete) return;
-
     try {
       setDeleting(true);
-
       await api.delete(`/work-entries/${entryToDelete.id}`);
-
-      setEntries((prev) =>
-        prev.filter((entry) => entry.id !== entryToDelete.id)
-      );
-
-      if (editingEntry?.id === entryToDelete.id) {
-        setEditingEntry(null);
-      }
-
+      if (editingEntry?.id === entryToDelete.id) setEditingEntry(null);
       setEntryToDelete(null);
       setError("");
+      // if last item on page, go back one page
+      const newPage =
+        entries.length === 1 && pagination.page > 0
+          ? pagination.page - 1
+          : pagination.page;
+      fetchEntries(newPage);
     } catch (err) {
       console.error("Failed to delete work entry:", err);
       setError("Failed to delete work entry.");
@@ -116,7 +133,7 @@ function WorkEntriesPage() {
   }
 
   useEffect(() => {
-    fetchEntries();
+    fetchEntries(0);
   }, []);
 
   return (
@@ -135,9 +152,9 @@ function WorkEntriesPage() {
                 Add, edit, and review your recorded shifts in one place.
               </p>
             </div>
-
             <div className="text-sm text-zinc-500">
-              {entries.length} {entries.length === 1 ? "entry" : "entries"}
+              {pagination.totalElements}{" "}
+              {pagination.totalElements === 1 ? "entry" : "entries"}
             </div>
           </div>
         </div>
@@ -180,18 +197,22 @@ function WorkEntriesPage() {
                 entries={entries}
                 onEditEntry={handleEditEntry}
                 onDeleteEntry={handleAskDelete}
+                pagination={pagination}
+                onPageChange={(newPage) => fetchEntries(newPage)}
+                loading={loading}
+                sortDirection={sortDirection}
+                onSortChange={handleSortChange}
               />
             </div>
           )}
         </div>
       </div>
 
+      {/* AlertDialog unchanged */}
       <AlertDialog
         open={Boolean(entryToDelete)}
         onOpenChange={(open) => {
-          if (!open && !deleting) {
-            setEntryToDelete(null);
-          }
+          if (!open && !deleting) setEntryToDelete(null);
         }}
       >
         <AlertDialogContent className="border-zinc-800 bg-zinc-950 text-zinc-100">
@@ -213,7 +234,6 @@ function WorkEntriesPage() {
               . This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-
           <AlertDialogFooter>
             <AlertDialogCancel
               disabled={deleting}
@@ -221,7 +241,6 @@ function WorkEntriesPage() {
             >
               Cancel
             </AlertDialogCancel>
-
             <AlertDialogAction
               onClick={handleConfirmDelete}
               disabled={deleting}

@@ -10,7 +10,23 @@ import {
 } from "recharts";
 
 function WeeklyIncomeCharts({ weeklyIncome }) {
-  const chartData = Array.isArray(weeklyIncome) ? weeklyIncome : [];
+  const chartData = Array.isArray(weeklyIncome)
+    ? weeklyIncome.map((item) => ({
+        ...item,
+        totalPay: parseFloat(item.totalPay),
+      }))
+    : [];
+
+  if (chartData.length === 0) {
+    return (
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+        <h3 className="text-lg font-semibold text-zinc-100">Weekly Income</h3>
+        <p className="mt-6 text-center text-sm text-zinc-500">
+          No data for the selected range. Try a wider date range.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">

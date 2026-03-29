@@ -58,16 +58,11 @@ public class WorkEntryController {
             @RequestParam LocalDate to,
             @RequestParam(required = false) Long companyId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-
-
-    ){
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
         return workEntryService.getPaginatedWorkEntriesBetweenDates(
-                from,
-                to,
-                companyId,
-                page,
-                size
-                );
+                from, to, companyId, page, size, sortDirection
+        );
     }
 }

@@ -28,15 +28,18 @@ function formatHours(hours) {
   return `${Number(hours).toFixed(2)}`;
 }
 
-function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
+function WorkEntryTable({
+  entries,
+  onEditEntry,
+  onDeleteEntry,
+  pagination,
+  onPageChange,
+  loading,
+  sortDirection,
+  onSortChange,
+}) {
   return (
     <Card className="rounded-2xl border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl text-zinc-100">Saved Work Entries</CardTitle>
-        <CardDescription className="text-zinc-400">
-          All recorded shifts returned by the backend.
-        </CardDescription>
-      </CardHeader>
       <CardContent>
         {entries.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12 text-zinc-400">
@@ -46,18 +49,36 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
             </p>
           </div>
         ) : (
-          <div className="max-h-[520px] overflow-auto rounded-xl border border-zinc-800 bg-zinc-950" style={{ scrollbarWidth: "thin" }}>
+          <div className="overflow-x-auto rounded-xl border border-zinc-800">
             <Table className="border-separate border-spacing-y-1">
-              <TableHeader className="sticky top-0 z-10 bg-zinc-900">
+              <TableHeader className="bg-zinc-900">
                 <TableRow className="border-zinc-800 bg-zinc-900 hover:bg-zinc-900">
-                  <TableHead className="text-zinc-400">Date</TableHead>
+                  <TableHead
+                    className="cursor-pointer select-none text-zinc-400 hover:text-zinc-100 transition-colors"
+                    onClick={() =>
+                      onSortChange(sortDirection === "desc" ? "asc" : "desc")
+                    }
+                  >
+                    <div className="flex items-center gap-1">
+                      Date
+                      <span className="text-zinc-500">
+                        {sortDirection === "desc" ? "↓" : "↑"}
+                      </span>
+                    </div>
+                  </TableHead>
                   <TableHead className="text-zinc-400">Company</TableHead>
                   <TableHead className="text-zinc-400">Start</TableHead>
                   <TableHead className="text-zinc-400">End</TableHead>
-                  <TableHead className="text-right text-zinc-400">Break</TableHead>
-                  <TableHead className="text-right text-zinc-400">Hours</TableHead>
-                  <TableHead className="text-right text-zinc-400">Gross Pay</TableHead>
-                  
+                  <TableHead className="text-right text-zinc-400">
+                    Break
+                  </TableHead>
+                  <TableHead className="text-right text-zinc-400">
+                    Hours
+                  </TableHead>
+                  <TableHead className="text-right text-zinc-400">
+                    Gross Pay
+                  </TableHead>
+
                   <TableHead className="text-zinc-400">Notes</TableHead>
                   <TableHead className="w-[180px] text-right text-zinc-400">
                     Actions
@@ -73,7 +94,10 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
                   >
                     <TableCell>{entry.workDate || "-"}</TableCell>
                     <TableCell>
-                      {entry.companyName ?? entry.company?.name ?? entry.companyId ?? "-"}
+                      {entry.companyName ??
+                        entry.company?.name ??
+                        entry.companyId ??
+                        "-"}
                     </TableCell>
                     <TableCell>{entry.startTime || "-"}</TableCell>
                     <TableCell>{entry.endTime || "-"}</TableCell>
@@ -119,6 +143,44 @@ function WorkEntryTable({ entries, onEditEntry, onDeleteEntry }) {
                 ))}
               </TableBody>
             </Table>
+          </div>
+        )}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between px-1 text-sm text-zinc-300">
+            <div>
+              Page{" "}
+              <span className="font-medium text-zinc-100">
+                {pagination.page + 1}
+              </span>{" "}
+              of{" "}
+              <span className="font-medium text-zinc-100">
+                {Math.max(pagination.totalPages, 1)}
+              </span>
+              {" · "}
+              <span className="text-zinc-400">
+                {pagination.totalElements} total entries
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onPageChange(pagination.page - 1)}
+                disabled={pagination.first || loading}
+                className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+              >
+                Previous
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onPageChange(pagination.page + 1)}
+                disabled={pagination.last || loading}
+                className="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 disabled:opacity-50"
+              >
+                Next
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

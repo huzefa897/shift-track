@@ -263,24 +263,25 @@ public class WorkEntryService {
     }
 
     //Pagination
-    public Page<WorkEntryResponse> getPaginatedWorkEntriesBetweenDates(LocalDate from, LocalDate to, Long companyId, int page, int size){
-        validateDateRange(from,to);
-        Pageable pageable = PageRequest.of(
-                page,size, Sort.by(Sort.Direction.DESC,"workDate")
-        );
+    public Page<WorkEntryResponse> getPaginatedWorkEntriesBetweenDates(
+            LocalDate from, LocalDate to, Long companyId,
+            int page, int size, String sortDirection) {
+
+        validateDateRange(from, to);
+
+        Sort sort = sortDirection.equalsIgnoreCase("asc")
+                ? Sort.by(Sort.Direction.ASC, "workDate")
+                : Sort.by(Sort.Direction.DESC, "workDate");
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
         Page<WorkEntry> entriesPage;
-        if(companyId!=null){
-            entriesPage = workEntryRepository.findByWorkDateBetweenAndCompanyId(
-                    from,to,companyId,pageable
-            );
+        if (companyId != null) {
+            entriesPage = workEntryRepository.findByWorkDateBetweenAndCompanyId(from, to, companyId, pageable);
+        } else {
+            entriesPage = workEntryRepository.findByWorkDateBetween(from, to, pageable);
         }
-            else{
-                entriesPage=workEntryRepository.findByWorkDateBetween(
-                        from,
-                        to,
-                        pageable
-                );
-        }
+
         return entriesPage.map(this::mapToResponse);
     }
 
@@ -297,13 +298,9 @@ public class WorkEntryService {
         Map<LocalDate, BigDecimal> weeklyTotals = new LinkedHashMap<>();
         entries.stream()
                 .sorted(Comparator.comparing(WorkEntry::getWorkDate))
-                .forEach(entry->{
-                    LocalDate weekStart =entry.getWorkDate().with(DayOfWeek.MONDAY);
-                    weeklyTotals.put(
-                            weekStart,
-                            weeklyTotals.getOrDefault(weekStart,BigDecimal.ZERO)
-                                    .add(entry.getCalculatedPay())!=null?entry.getCalculatedPay():BigDecimal.ZERO);
-
+                .forEach(entry -> {
+                    LocalDate weekStart = entry.getWorkDate().with(DayOfWeek.MONDAY);
+                    weeklyTotals.merge(weekStart, entry.getCalculatedPay(), BigDecimal::add);
                 });
         return weeklyTotals.entrySet().stream()
                 .map(entry->WeeklyIncomeResponse.builder()
