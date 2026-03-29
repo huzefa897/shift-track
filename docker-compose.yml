@@ -1,17 +1,46 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:15
-    container_name: shifttrack_postgres
+    image: postgres:16
+    container_name: shifttrack-db
     environment:
-      POSTGRES_DB: shifttrack_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shifttrack
+      POSTGRES_USER: shifttrack
+      POSTGRES_PASSWORD: shifttrack
     ports:
-      - "5435:5432"
+      - "5432:5432"
     volumes:
-      - shifttrack_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shifttrack"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./ShiftTrack-backend
+      dockerfile: Dockerfile
+    container_name: shifttrack-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/shifttrack
+      SPRING_DATASOURCE_USERNAME: shifttrack
+      SPRING_DATASOURCE_PASSWORD: shifttrack
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./shifttrack-frontend
+      dockerfile: Dockerfile
+    container_name: shifttrack-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
-  shifttrack_data:
+  postgres_data:

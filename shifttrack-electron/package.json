@@ -1,0 +1,50 @@
+{
+  "name": "shifttrack",
+  "version": "1.0.0",
+  "description": "ShiftTrack Desktop Launcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.shifttrack.app",
+    "productName": "ShiftTrack",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "loading.html",
+      "assets/**"
+    ],
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "project",
+        "filter": [
+          "docker-compose.yml",
+          "ShiftTrack-backend/**",
+          "shifttrack-frontend/**",
+          "!**/node_modules/**",
+          "!**/target/**",
+          "!**/.git/**"
+        ]
+      }
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/tray-icon.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/tray-icon.png"
+    }
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}
